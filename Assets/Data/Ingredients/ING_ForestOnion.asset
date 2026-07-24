@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
   displayName: Forest Onion
   slot: 1
-  jarSprite: {fileID: 0}
+  jarSprite: {fileID: 21300000, guid: 9e01415ceffd04ff18a9ea3944f9b8fd, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
+  dishSprite: {fileID: 0}
   startsLocked: 0
   placeholderColor: {r: 0.35, g: 0.7, b: 0.3, a: 1}

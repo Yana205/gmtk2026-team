@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
   displayName: Eggplant
   slot: 1
-  jarSprite: {fileID: 0}
+  jarSprite: {fileID: 21300000, guid: 919355d137720453f8d517185f9091f7, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
+  dishSprite: {fileID: 0}
   startsLocked: 0
   placeholderColor: {r: 0.55, g: 0.3, b: 0.65, a: 1}

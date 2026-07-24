@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
   displayName: Ham
   slot: 0
-  jarSprite: {fileID: 0}
+  jarSprite: {fileID: 21300000, guid: b363c0c2d9c7e46298d633b2a78e060b, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
+  dishSprite: {fileID: -3732569312822304767, guid: 430ed82f834cf4f8e9dd82c28000770f, type: 3}
   startsLocked: 0
   placeholderColor: {r: 1, g: 0.6, b: 0.7, a: 1}

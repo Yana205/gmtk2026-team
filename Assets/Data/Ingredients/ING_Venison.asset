@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
   displayName: Venison
   slot: 0
-  jarSprite: {fileID: 0}
+  jarSprite: {fileID: 21300000, guid: ebb7531cd48c5411a8e7692249b339b1, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
+  dishSprite: {fileID: -7828918300557819469, guid: 325078c6aec4c4979853482a70922acc, type: 3}
   startsLocked: 0
   placeholderColor: {r: 0.55, g: 0.35, b: 0.2, a: 1}

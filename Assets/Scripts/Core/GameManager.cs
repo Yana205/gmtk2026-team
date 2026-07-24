@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CustomerGenerator generator;
     [SerializeField] private CustomerView customerView;
     [SerializeField] private GameObject dishOnCounter;   // dish + mead mug parent
+    [SerializeField] private Image dishImage;            // the bowl — swapped to the Main's whole-dish art
     [SerializeField] private ReactionFX reactionFX;
     [SerializeField] private PatienceMeter patience;
     [SerializeField] private ToastBanner toast;
@@ -89,7 +90,7 @@ public class GameManager : MonoBehaviour
         if (state != GameState.Ordering) return;
         SetState(GameState.Cooking);
         screens.ShowKitchen();
-        stewBuilder.BeginCooking(currentOrder);   // dresses the corner portrait
+        stewBuilder.BeginCooking(currentOrder, generator.CurrentCharacter);   // portrait follows you in
     }
 
     public void SubmitDish(Dictionary<SlotType, IngredientSO> picks)
@@ -99,6 +100,12 @@ public class GameManager : MonoBehaviour
         stewBuilder.Clear();
         SetState(GameState.Delivering);
         screens.ShowTavern();
+        // The served bowl is the Main's whole-dish art (KRAKEN/RAT/FOX/HAM/ELK FINAL STEW).
+        if (dishImage && submittedPicks.TryGetValue(SlotType.Main, out var mainPick) && mainPick && mainPick.dishSprite)
+        {
+            dishImage.sprite = mainPick.dishSprite;
+            dishImage.color  = Color.white;
+        }
         dishOnCounter.SetActive(true);            // dish + mead mug together
     }
 
@@ -142,9 +149,11 @@ public class GameManager : MonoBehaviour
         SetState(GameState.CustomerEntering);
         yield return ConsumeUnlockBeats();          // unlocks fire ONLY between customers
         if (nightOver) { EndNight(); yield break; }
+        // Fixed-visitor night ends when the scripted guest list runs out (Letitia → Caledon → Milog).
+        if (generator.FixedMode && !generator.HasNext) { EndNight(); yield break; }
         yield return new WaitForSeconds(config.delayBetweenCustomers);
         currentOrder = generator.Draw();
-        yield return customerView.EnterRoutine(currentOrder);
+        yield return customerView.EnterRoutine(currentOrder, generator.CurrentCharacter);
         patience.StartDraining();
         SetState(GameState.Ordering);
     }
@@ -158,8 +167,15 @@ public class GameManager : MonoBehaviour
         totalHearts += result.hearts;
         totalCoins  += result.coins;
         customersServed++;
-        var lore = story.MakeReactionNapkin(result.hearts, result.coins, customersServed);
-        if (lore != null) napkins.Add(lore);      // served customers leave a note behind
+        // Named visitor leaves THEIR verbatim napkin; grey-box customers fall back to the pooled lore.
+        var ch = generator.CurrentCharacter;
+        if (ch != null && !string.IsNullOrEmpty(ch.napkinText))
+            napkins.Add(new StoryDataSO.UnlockBeat { hasNapkin = true, guestName = ch.displayName, napkinText = ch.napkinText });
+        else
+        {
+            var lore = story.MakeReactionNapkin(result.hearts, result.coins, customersServed);
+            if (lore != null) napkins.Add(lore);
+        }
         dishOnCounter.SetActive(false);
         customerView.ShowReaction(result.hearts);
         reactionFX.Play(result.hearts, result.coins);

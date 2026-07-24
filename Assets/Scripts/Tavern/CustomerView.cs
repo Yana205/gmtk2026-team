@@ -14,6 +14,9 @@ public class CustomerView : MonoBehaviour
     [SerializeField] private RectTransform rect;         // hop / droop
     [SerializeField] private GameObject thoughtBubble;   // hungry icon while ordering
 
+    // Grey tint shown behind the bust until the real portrait PNG is assigned on the CharacterSO.
+    private static readonly Color PortraitPlaceholderTint = new Color(0.6f, 0.6f, 0.65f, 1f);
+
     private Vector2 homePos;
 
     private void Awake()
@@ -23,9 +26,12 @@ public class CustomerView : MonoBehaviour
         thoughtBubble.SetActive(false);
     }
 
-    public IEnumerator EnterRoutine(Dictionary<SlotType, IngredientSO> order)
+    public IEnumerator EnterRoutine(Dictionary<SlotType, IngredientSO> order, CharacterSO character)
     {
-        bust.Dress(order);
+        if (character != null)
+            bust.ShowPortrait(character.portrait, PortraitPlaceholderTint);  // real visitor
+        else
+            bust.Dress(order);                                                    // grey-box dressing
         rect.anchoredPosition = homePos;
         yield return Tween.Fade(group, 0f, 1f, feel.fadeInSeconds, feel.easeCurve);
         thoughtBubble.SetActive(true);
