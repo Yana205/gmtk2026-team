@@ -17,7 +17,7 @@ MonoBehaviour:
   patienceSeconds: 20
   patienceBonusThreshold: 0.5
   delayBetweenCustomers: 0.5
-  minSlotsToServe: 3
+  minSlotsToServe: 1
   coinsPerHeart: 5
   patienceBonusCoins: 2
   lastCallMultiplier: 2

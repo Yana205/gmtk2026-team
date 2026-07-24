@@ -24,6 +24,22 @@ namespace TavernStewBuild
         [MenuItem("Tavern Stew/Build/2 Build Main Scene")]
         public static void Run()
         {
+            // GUARD (2026-07-24): the layout is now hand-grouped & edited manually. This button
+            // DELETES everything in Main.unity and regenerates the old greybox, wiping that work.
+            // Kept for reference only — must be confirmed twice to run.
+            if (!EditorUtility.DisplayDialog(
+                    "Wipe & rebuild Main.unity?",
+                    "This DELETES the entire scene (including your manual grouping and any art) and " +
+                    "regenerates the greybox from code.\n\nYou are editing the layout manually now — " +
+                    "you almost certainly do NOT want this.",
+                    "Wipe everything", "Cancel"))
+                return;
+            if (!EditorUtility.DisplayDialog(
+                    "Are you absolutely sure?",
+                    "Last chance. All manual layout work in Main.unity will be lost.",
+                    "Yes, wipe it", "Cancel"))
+                return;
+
             var scene = EditorSceneManager.OpenScene(TSBUtil.ScenePath, OpenSceneMode.Single);
 
             foreach (var root in scene.GetRootGameObjects())
@@ -95,26 +111,39 @@ namespace TavernStewBuild
         }
 
         // ------------------------------------------------ Tavern
+        // Layout v3 (tavern_layout.svg): customer CENTER · menu book MID-LEFT · a DESK strip along
+        // the bottom holding the NIGHT BAR (bottom-left, was the top-left candle), the DISH
+        // (bottom-center, hidden until serve) and the NAPKINS pile (bottom-right).
         private static void BuildTavernScreen()
         {
             var t = MakeCanvas("TavernScreen", 0).transform;
             TSBUtil.Stretch("Background", t, new Color(.16f, .12f, .10f));
 
-            // ClockUI — candle drains vertically, time label under it
+            // DESK — decorative counter strip along the bottom, drawn under the desk items
+            var desk = TSBUtil.Box("Desk", t, Vector2.zero, new Vector2(1860f, 250f), new Color(.13f, .09f, .07f));
+            var deskRt = (RectTransform)desk.transform;
+            deskRt.anchorMin = deskRt.anchorMax = new Vector2(0.5f, 0f);
+            deskRt.pivot = new Vector2(0.5f, 0f);
+            deskRt.anchoredPosition = new Vector2(0f, 20f);
+
+            // ClockUI ("NIGHT BAR") — vertical bar, bottom-left, sitting on the desk; drains ↓.
+            // Keeps GO names ClockUI/Candle + ClockUI/TimeLabel so NightClock wiring is unchanged.
             var clockUi = TSBUtil.Child("ClockUI", t);
-            var crt = TSBUtil.Place(clockUi, new Vector2(110f, -160f), new Vector2(130f, 280f));
-            crt.anchorMin = crt.anchorMax = new Vector2(0f, 1f);
-            var candle = TSBUtil.Box("Candle", clockUi.transform, new Vector2(0f, 30f), new Vector2(44f, 170f),
+            var crt = TSBUtil.Place(clockUi, new Vector2(150f, 220f), new Vector2(90f, 320f));
+            crt.anchorMin = crt.anchorMax = new Vector2(0f, 0f);
+            TSBUtil.Label("NightCaption", clockUi.transform, new Vector2(0f, 185f), new Vector2(140f, 30f),
+                "NIGHT", 22f, CaptionColor);
+            var candle = TSBUtil.Box("Candle", clockUi.transform, new Vector2(0f, 15f), new Vector2(60f, 250f),
                 new Color(.93f, .85f, .55f)).GetComponent<Image>();
             candle.type = Image.Type.Filled;
             candle.fillMethod = Image.FillMethod.Vertical;
             candle.fillAmount = 1f;
-            TSBUtil.Label("TimeLabel", clockUi.transform, new Vector2(0f, -95f), new Vector2(130f, 40f),
+            TSBUtil.Label("TimeLabel", clockUi.transform, new Vector2(0f, -185f), new Vector2(140f, 40f),
                 "3:00", 34f, TextWarm);
 
-            // Customer — one simple body rect + 3 labeled worn slots + slot captions
+            // Customer — CENTER. One simple body rect + 3 labeled worn slots + slot captions.
             var customer = TSBUtil.Child("Customer", t);
-            TSBUtil.Place(customer, new Vector2(-200f, -40f), new Vector2(360f, 520f));
+            TSBUtil.Place(customer, new Vector2(0f, 90f), new Vector2(360f, 520f));
             customer.AddComponent<CanvasGroup>();
             var body = TSBUtil.Box("Body", customer.transform, new Vector2(0f, -70f), new Vector2(280f, 360f),
                 new Color(.50f, .46f, .42f), raycast: true);   // the Button's click surface
@@ -142,21 +171,26 @@ namespace TavernStewBuild
 
             TSBUtil.Child("ReactionFX", t).AddComponent<ReactionFX>();
 
+            // DISH — BOTTOM-CENTER, on the desk, hidden until Serve
             var dish = TSBUtil.Child("DishOnCounter", t);
-            TSBUtil.Place(dish, new Vector2(-200f, -420f), new Vector2(420f, 170f));
+            var dishRt = TSBUtil.Place(dish, new Vector2(0f, 140f), new Vector2(420f, 170f));
+            dishRt.anchorMin = dishRt.anchorMax = new Vector2(0.5f, 0f);
             TSBUtil.Box("Dish", dish.transform, new Vector2(-60f, -10f), new Vector2(220f, 90f), new Color(.70f, .65f, .55f));
             TSBUtil.Box("MeadMug", dish.transform, new Vector2(150f, 5f), new Vector2(90f, 130f), new Color(.85f, .60f, .25f));
             dish.SetActive(false);
 
-            // MenuBook — the primary call to action, big and obvious
-            var menu = TSBUtil.ButtonBox("MenuBook", t, new Vector2(480f, -120f), new Vector2(400f, 230f),
+            // MenuBook — MID-LEFT, the primary call to action, big and obvious
+            var menu = TSBUtil.ButtonBox("MenuBook", t, Vector2.zero, new Vector2(380f, 220f),
                 new Color(.50f, .32f, .18f), "MENU BOOK", 40f, TextWarm);
-            TSBUtil.Label("SubLabel", menu.transform, new Vector2(0f, -70f), new Vector2(380f, 40f),
+            var menuRt = (RectTransform)menu.transform;
+            menuRt.anchorMin = menuRt.anchorMax = new Vector2(0f, 0.5f);
+            menuRt.anchoredPosition = new Vector2(320f, 20f);
+            TSBUtil.Label("SubLabel", menu.transform, new Vector2(0f, -70f), new Vector2(360f, 40f),
                 "click to start cooking", 22f, new Color(1f, 1f, 1f, .55f));
 
-            // PatienceBar — hidden root, horizontal fill, above the customer
+            // PatienceBar — hidden root, horizontal fill, above the (centered) customer
             var bar = TSBUtil.Child("PatienceBar", t);
-            TSBUtil.Place(bar, new Vector2(-200f, 245f), new Vector2(340f, 30f));
+            TSBUtil.Place(bar, new Vector2(0f, 400f), new Vector2(340f, 30f));
             TSBUtil.Stretch("BG", bar.transform, new Color(.10f, .09f, .08f));
             var fill = TSBUtil.Box("Fill", bar.transform, Vector2.zero, new Vector2(330f, 22f),
                 new Color(.45f, .75f, .35f)).GetComponent<Image>();
@@ -165,9 +199,10 @@ namespace TavernStewBuild
             fill.fillAmount = 1f;
             bar.SetActive(false);
 
-            // NapkinPile — Button whose click surface is the (hidden until first napkin) PileVisual
+            // NapkinPile — BOTTOM-RIGHT, on the desk. Button surface = the (hidden) PileVisual.
             var pileGo = TSBUtil.Child("NapkinPile", t);
-            TSBUtil.Place(pileGo, new Vector2(700f, -400f), new Vector2(170f, 130f));
+            var pileRt = TSBUtil.Place(pileGo, new Vector2(-200f, 140f), new Vector2(170f, 130f));
+            pileRt.anchorMin = pileRt.anchorMax = new Vector2(1f, 0f);
             var pileVisual = TSBUtil.Box("PileVisual", pileGo.transform, Vector2.zero, new Vector2(150f, 110f),
                 new Color(.92f, .90f, .82f), raycast: true);
             TSBUtil.Label("Label", pileVisual.transform, Vector2.zero, new Vector2(150f, 40f),
@@ -178,10 +213,10 @@ namespace TavernStewBuild
             pileVisual.SetActive(false);
 
             // Hints (texts come from the HintSystem comments in the repo — not invented)
-            var tavernHint = TSBUtil.Label("TavernHint", t, new Vector2(0f, 460f), new Vector2(1100f, 60f),
+            var tavernHint = TSBUtil.Label("TavernHint", t, new Vector2(0f, 470f), new Vector2(1100f, 60f),
                 "Read their outfit... then click the menu book!", 30f, TextWarm);
             tavernHint.gameObject.SetActive(false);
-            var serveHint = TSBUtil.Label("ServeHint", t, new Vector2(0f, 460f), new Vector2(1100f, 60f),
+            var serveHint = TSBUtil.Label("ServeHint", t, new Vector2(0f, 470f), new Vector2(1100f, 60f),
                 "Click the customer to hand it over!", 30f, TextWarm);
             serveHint.gameObject.SetActive(false);
         }
@@ -199,14 +234,17 @@ namespace TavernStewBuild
         }
 
         // ------------------------------------------------ Kitchen
+        // Layout v3 (kitchen_layout.svg): portrait TOP-LEFT · pot MID-LEFT · shelf RIGHT as a
+        // 3-column MAIN | SIDE | SAUCE matrix of jar buttons · serve button BOTTOM-CENTER.
         private static void BuildCookingScreen()
         {
             var k = MakeCanvas("CookingScreen", 1).transform;
             TSBUtil.Stretch("Background", k, new Color(.11f, .13f, .15f));
 
-            // Portrait — mirrors the customer so the order follows you into the kitchen
+            // Portrait — TOP-LEFT. Mirrors the customer so the order follows you into the kitchen.
             var portrait = TSBUtil.Child("Portrait", k);
-            TSBUtil.Place(portrait, new Vector2(-800f, 290f), new Vector2(260f, 360f));
+            var prt = TSBUtil.Place(portrait, new Vector2(200f, -220f), new Vector2(260f, 360f));
+            prt.anchorMin = prt.anchorMax = new Vector2(0f, 1f);
             TSBUtil.Label("Caption", portrait.transform, new Vector2(0f, 165f), new Vector2(240f, 36f),
                 "THE ORDER", 26f, CaptionColor);
             TSBUtil.Box("PortraitBase", portrait.transform, new Vector2(0f, -50f), new Vector2(170f, 190f),
@@ -216,24 +254,27 @@ namespace TavernStewBuild
             WornSlot("SauceLayer", portrait.transform, new Vector2(0f, -115f), new Vector2(130f, 40f), 18f);
             portrait.AddComponent<BustDresser>();
 
-            var kFill = TSBUtil.Box("KitchenPatienceFill", k, new Vector2(-800f, 90f), new Vector2(200f, 16f),
+            var kFill = TSBUtil.Box("KitchenPatienceFill", k, new Vector2(200f, -430f), new Vector2(220f, 16f),
                 new Color(.45f, .75f, .35f)).GetComponent<Image>();
+            var kFillRt = (RectTransform)kFill.transform;
+            kFillRt.anchorMin = kFillRt.anchorMax = new Vector2(0f, 1f);
             kFill.type = Image.Type.Filled;
             kFill.fillMethod = Image.FillMethod.Horizontal;
             kFill.fillAmount = 1f;
 
-            // Shelf — 3 labeled sections, manual positions (jars land here in task 8)
+            // Shelf — RIGHT side, 3-column MAIN | SIDE | SAUCE matrix. Jars land here in task 8 at
+            // fixed cell positions (manual, so locked jars leave a visible gap in their column).
             var shelf = TSBUtil.Child("Shelf", k);
-            var srt = TSBUtil.Place(shelf, new Vector2(120f, -50f), new Vector2(1500f, 260f));
-            srt.anchorMin = srt.anchorMax = new Vector2(0.5f, 1f);
-            srt.pivot = new Vector2(0.5f, 1f);
-            ShelfHeader(shelf.transform, "MAIN", -466f);
-            ShelfHeader(shelf.transform, "SIDE", 69f);
-            ShelfHeader(shelf.transform, "SAUCE", 535f);
+            var srt = TSBUtil.Place(shelf, new Vector2(-360f, -20f), new Vector2(680f, 780f));
+            srt.anchorMin = srt.anchorMax = new Vector2(1f, 0.5f);
+            ShelfHeader(shelf.transform, "MAIN", -200f);
+            ShelfHeader(shelf.transform, "SIDE", 0f);
+            ShelfHeader(shelf.transform, "SAUCE", 200f);
 
-            // Pot — base + one overlay Image per slot; potRect = the Pot parent
+            // Pot — MID-LEFT. Base + one overlay Image per slot; potRect = the Pot parent.
             var pot = TSBUtil.Child("Pot", k);
-            TSBUtil.Place(pot, new Vector2(-320f, -300f), new Vector2(520f, 380f));
+            var potRt = TSBUtil.Place(pot, new Vector2(430f, -60f), new Vector2(520f, 380f));
+            potRt.anchorMin = potRt.anchorMax = new Vector2(0f, 0.5f);
             TSBUtil.Label("Caption", pot.transform, new Vector2(0f, 145f), new Vector2(500f, 36f),
                 "THE POT — click jars to fill it", 26f, CaptionColor);
             TSBUtil.Box("PotBase", pot.transform, new Vector2(0f, -40f), new Vector2(520f, 300f), new Color(.28f, .28f, .30f));
@@ -244,8 +285,12 @@ namespace TavernStewBuild
             var flyer = TSBUtil.Box("Flyer", k, Vector2.zero, new Vector2(84f, 84f), Color.white);
             flyer.SetActive(false);
 
-            TSBUtil.ButtonBox("ServeButton", k, new Vector2(620f, -390f), new Vector2(320f, 130f),
+            // ServeButton — BOTTOM-CENTER
+            var serve = TSBUtil.ButtonBox("ServeButton", k, Vector2.zero, new Vector2(340f, 120f),
                 new Color(.30f, .55f, .30f), "SERVE", 44f, new Color(.95f, .98f, .90f));
+            var serveRt = (RectTransform)serve.transform;
+            serveRt.anchorMin = serveRt.anchorMax = new Vector2(0.5f, 0f);
+            serveRt.anchoredPosition = new Vector2(0f, 150f);
 
             TSBUtil.Child("StewBuilder", k).AddComponent<StewBuilder>();
 
@@ -254,9 +299,10 @@ namespace TavernStewBuild
             kitchenHint.gameObject.SetActive(false);
         }
 
+        // Header hangs from the shelf top, centered over its column (x is column offset)
         private static void ShelfHeader(Transform shelf, string text, float x)
         {
-            var tmp = TSBUtil.Label("Header" + text, shelf, new Vector2(x, -25f), new Vector2(300f, 36f),
+            var tmp = TSBUtil.Label("Header" + text, shelf, new Vector2(x, -30f), new Vector2(180f, 36f),
                 text, 28f, CaptionColor);
             var rt = (RectTransform)tmp.transform;
             rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 1f);   // hang from the shelf top

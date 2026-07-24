@@ -19,9 +19,12 @@ namespace TavernStewBuild
             "MountainCarrot", "Eggplant", "ParadiseCumin", "SalamanderPepper", "PixieDust",
         };
 
-        // x per key under the Shelf container (sections: MAIN | SIDE | SAUCE), y is shared
-        private static readonly float[] X = { -673f, -535f, -397f, -259f, -69f, 69f, 207f, 397f, 535f, 673f };
-        private const float JarY = -135f;
+        // Layout v3 — 3-column matrix under the right-side Shelf: column = slot (MAIN | SIDE | SAUCE),
+        // row = order within the slot. Jars hang from the shelf top (anchor 0.5,1). Manual cells so a
+        // locked jar (Kraken, Dragon, Pixie Dust) leaves a visible gap in its column until unlocked.
+        //             Ham    Ven    Krak   Drag | Onion  Carrot Eggpl | Cumin  Pepper Pixie
+        private static readonly float[] X = { -200f, -200f, -200f, -200f, 0f, 0f, 0f, 200f, 200f, 200f };
+        private static readonly float[] Y = { -150f, -325f, -500f, -675f, -150f, -325f, -500f, -150f, -325f, -500f };
 
         [MenuItem("Tavern Stew/Build/3 Jar Prefab + Instances")]
         public static void Run()
@@ -63,7 +66,7 @@ namespace TavernStewBuild
                 inst.name = "Jar_" + Keys[i];
                 var irt = (RectTransform)inst.transform;
                 irt.anchorMin = irt.anchorMax = new Vector2(0.5f, 1f);   // hang from the shelf top
-                irt.anchoredPosition = new Vector2(X[i], JarY);
+                irt.anchoredPosition = new Vector2(X[i], Y[i]);
                 TSBUtil.Wire(inst.GetComponent<IngredientJar>(), ("ingredient", ing), ("stewBuilder", stew));
                 // edit-time preview only — IngredientJar.Awake re-applies both at runtime
                 inst.transform.Find("Icon").GetComponent<Image>().color = ing.placeholderColor;

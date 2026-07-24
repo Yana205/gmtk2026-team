@@ -3,9 +3,35 @@
 Anchor files: `tasks.md` (what to do) · `BUILD_PLAN.md` (how it must be done) · this file (where we are).
 Updated by Claude after every change and after each of Yan's reviews.
 
-**Last updated:** 2026-07-24 (playtest round 1) — Yan played, called the first layout unreadable.
-Layout v2 + design-mode timer freeze + reaction-napkin lore shipped and screenshot-verified.
-Awaiting Yan's second look.
+**Last updated:** 2026-07-24 (layout v3) — rebuilt both screens to Yan's SVG mockups
+(`tavern_layout.svg` / `kitchen_layout.svg`). Gameplay/wiring untouched. Edit-mode verified.
+Awaiting Yan's look.
+
+## Layout v3 (SVG-driven scene rebuild, 2026-07-24)
+
+Yan supplied two SVG layout mockups; rebuilt Main.unity to match while preserving all gameplay
+(same GO names/paths → wiring unchanged; audit PASS; 10 jars intact). Build pipeline re-run:
+BuildMainScene → CreateJarPrefab → WireScene → AuditSlots (all idempotent, scene saved).
+
+**Tavern (`BuildMainScene.BuildTavernScreen`):**
+- Customer → screen CENTER (kept its labeled MAIN/SIDE/SAUCE worn-slots — required by BustDresser
+  wiring + Yan's readability rule; SVG's "shoulder bust" box is just the container).
+- MenuBook → MID-LEFT (anchor 0,0.5).
+- New **DESK** strip along the bottom; the clock candle became the **NIGHT BAR** (vertical,
+  BOTTOM-LEFT) — GO still named `ClockUI/Candle` + `ClockUI/TimeLabel` so NightClock wiring holds.
+- Dish → BOTTOM-CENTER, Napkins → BOTTOM-RIGHT (both still hidden until serve, by design).
+
+**Kitchen (`BuildMainScene.BuildCookingScreen` + `CreateJarPrefab`):**
+- Portrait → TOP-LEFT, Pot → MID-LEFT, ServeButton → BOTTOM-CENTER.
+- Shelf → RIGHT, now a 3-column **MAIN | SIDE | SAUCE** matrix. Jars manually positioned per column
+  (Main 4 / Side 3 / Sauce 3) — deliberately NOT a GridLayoutGroup: 10 jars ≠ 9 cells and a layout
+  group would collapse the gaps left by locked jars (Kraken/Dragon/Pixie Dust). Serve "2/3" counter
+  from the SVG NOT added (would need a StewBuilder script change — offered, not done).
+
+**Edit-mode viewing:** added disposable `Assets/Editor/TavernStewBuild/ViewLayout.cs` →
+menu `Tavern Stew/View/{Show Tavern Only | Show Kitchen Only | Show All (play-ready)}` to isolate a
+screen in the editor without Play Mode. Scene stays saved with all canvases active (D2). Verified by
+rendering each screen to PNG straight from edit mode (RenderTexture capture, scene restored after).
 
 ## Playtest round 1 changes (Yan-directed, 2026-07-24)
 
