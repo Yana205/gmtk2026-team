@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CustomerGenerator generator;
     [SerializeField] private CustomerView customerView;
     [SerializeField] private GameObject dishOnCounter;   // dish + mead mug parent
+    [SerializeField] private Image dishImage;            // the bowl — swapped to the Main's whole-dish art
     [SerializeField] private ReactionFX reactionFX;
     [SerializeField] private PatienceMeter patience;
     [SerializeField] private ToastBanner toast;
@@ -99,6 +100,12 @@ public class GameManager : MonoBehaviour
         stewBuilder.Clear();
         SetState(GameState.Delivering);
         screens.ShowTavern();
+        // The served bowl is the Main's whole-dish art (KRAKEN/RAT/FOX/HAM/ELK FINAL STEW).
+        if (dishImage && submittedPicks.TryGetValue(SlotType.Main, out var mainPick) && mainPick && mainPick.dishSprite)
+        {
+            dishImage.sprite = mainPick.dishSprite;
+            dishImage.color  = Color.white;
+        }
         dishOnCounter.SetActive(true);            // dish + mead mug together
     }
 

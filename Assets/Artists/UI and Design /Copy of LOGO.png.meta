@@ -1,0 +1,572 @@
+fileFormatVersion: 2
+guid: 1de1d1a7f85d548768b3a3064fe5790f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1446919022334891254
+    second: Copy of LOGO_0
+  - first:
+      213: 4122294589474269422
+    second: Copy of LOGO_1
+  - first:
+      213: 4053064625359372196
+    second: Copy of LOGO_2
+  - first:
+      213: 7007295901094099347
+    second: Copy of LOGO_3
+  - first:
+      213: -6666593591040703833
+    second: Copy of LOGO_4
+  - first:
+      213: -5768147007720479531
+    second: Copy of LOGO_5
+  - first:
+      213: 3594416164563036483
+    second: Copy of LOGO_6
+  - first:
+      213: 2129864803935977867
+    second: Copy of LOGO_7
+  - first:
+      213: -7243392249265186572
+    second: Copy of LOGO_8
+  - first:
+      213: 9173665834436185566
+    second: Copy of LOGO_9
+  - first:
+      213: 8838476707086884989
+    second: Copy of LOGO_10
+  - first:
+      213: 2761872041331445580
+    second: Copy of LOGO_11
+  - first:
+      213: -8579091041102695425
+    second: Copy of LOGO_12
+  - first:
+      213: -8610602861307207176
+    second: Copy of LOGO_13
+  - first:
+      213: 5267256232843502381
+    second: Copy of LOGO_14
+  - first:
+      213: -775762457740321106
+    second: Copy of LOGO_15
+  - first:
+      213: -9035659465274533301
+    second: Copy of LOGO_16
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Copy of LOGO_0
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 748
+        width: 708
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f4d6094f2d741410800000000000000
+      internalID: 1446919022334891254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_1
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 732
+        width: 708
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee8e0299615553930800000000000000
+      internalID: 4122294589474269422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_2
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 715
+        width: 708
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4af3f3e7dc06f3830800000000000000
+      internalID: 4053064625359372196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_3
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 568
+        width: 92
+        height: 121
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 399b3ccee7aee3160800000000000000
+      internalID: 7007295901094099347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_4
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 555
+        width: 108
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a28f1833708b73a0800000000000000
+      internalID: -6666593591040703833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_5
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 568
+        width: 100
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d4a6908bdc63ffa0800000000000000
+      internalID: -5768147007720479531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_6
+      rect:
+        serializedVersion: 2
+        x: 558
+        y: 551
+        width: 106
+        height: 142
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 349a3b7257ee1e130800000000000000
+      internalID: 3594416164563036483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_7
+      rect:
+        serializedVersion: 2
+        x: 666
+        y: 569
+        width: 69
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b81063231ccce8d10800000000000000
+      internalID: 2129864803935977867
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_8
+      rect:
+        serializedVersion: 2
+        x: 734
+        y: 570
+        width: 142
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f81bbd502d4a7b90800000000000000
+      internalID: -7243392249265186572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_9
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 534
+        width: 708
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eddc4b5e8786f4f70800000000000000
+      internalID: 9173665834436185566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_10
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 517
+        width: 708
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d706a71acb398aa70800000000000000
+      internalID: 8838476707086884989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_11
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 393
+        width: 72
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4fc4a21df3245620800000000000000
+      internalID: 2761872041331445580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_12
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 309
+        width: 151
+        height: 188
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff3765fe622f0f880800000000000000
+      internalID: -8579091041102695425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_13
+      rect:
+        serializedVersion: 2
+        x: 385
+        y: 334
+        width: 146
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f162dd815ef08880800000000000000
+      internalID: -8610602861307207176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_14
+      rect:
+        serializedVersion: 2
+        x: 537
+        y: 334
+        width: 146
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d23699bf2ad091940800000000000000
+      internalID: 5267256232843502381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_15
+      rect:
+        serializedVersion: 2
+        x: 686
+        y: 300
+        width: 158
+        height: 196
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eaedd44a720fb35f0800000000000000
+      internalID: -775762457740321106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Copy of LOGO_16
+      rect:
+        serializedVersion: 2
+        x: 865
+        y: 393
+        width: 72
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4a5aecd693ea9280800000000000000
+      internalID: -9035659465274533301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Copy of LOGO_0: 1446919022334891254
+      Copy of LOGO_1: 4122294589474269422
+      Copy of LOGO_10: 8838476707086884989
+      Copy of LOGO_11: 2761872041331445580
+      Copy of LOGO_12: -8579091041102695425
+      Copy of LOGO_13: -8610602861307207176
+      Copy of LOGO_14: 5267256232843502381
+      Copy of LOGO_15: -775762457740321106
+      Copy of LOGO_16: -9035659465274533301
+      Copy of LOGO_2: 4053064625359372196
+      Copy of LOGO_3: 7007295901094099347
+      Copy of LOGO_4: -6666593591040703833
+      Copy of LOGO_5: -5768147007720479531
+      Copy of LOGO_6: 3594416164563036483
+      Copy of LOGO_7: 2129864803935977867
+      Copy of LOGO_8: -7243392249265186572
+      Copy of LOGO_9: 9173665834436185566
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

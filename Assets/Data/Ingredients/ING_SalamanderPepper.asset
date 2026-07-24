@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
   displayName: Salamander Pepper
   slot: 2
-  jarSprite: {fileID: 0}
+  jarSprite: {fileID: 21300000, guid: ab3ed569280ae46a08fdb7f46cf33b3d, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
+  dishSprite: {fileID: 0}
   startsLocked: 0
   placeholderColor: {r: 0.6, g: 0.1, b: 0.1, a: 1}

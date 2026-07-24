@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
   displayName: Paradise Cumin
   slot: 2
-  jarSprite: {fileID: 0}
+  jarSprite: {fileID: 21300000, guid: e750574cf94d64132b27710137a59b22, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
+  dishSprite: {fileID: 0}
   startsLocked: 0
   placeholderColor: {r: 0.95, g: 0.85, b: 0.3, a: 1}

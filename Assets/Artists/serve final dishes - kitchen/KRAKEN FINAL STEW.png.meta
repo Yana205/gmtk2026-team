@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9e01415ceffd04ff18a9ea3944f9b8fd
+guid: 53d8015915bb240aba99a0846604c9e9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7319545312386216997
-    second: jam3 - forest onion - Caledon + Milog_0
+      213: -3884275782305752274
+    second: KRAKEN FINAL STEW_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: jam3 - forest onion - Caledon + Milog_0
+      name: KRAKEN FINAL STEW_0
       rect:
         serializedVersion: 2
-        x: 554
-        y: 172
-        width: 652
-        height: 779
+        x: 563
+        y: 51
+        width: 1055
+        height: 863
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bdb08d9a150cb6a90800000000000000
-      internalID: -7319545312386216997
+      spriteID: e2b530a71c7481ac0800000000000000
+      internalID: -3884275782305752274
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      jam3 - forest onion - Caledon + Milog_0: -7319545312386216997
+      KRAKEN FINAL STEW_0: -3884275782305752274
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

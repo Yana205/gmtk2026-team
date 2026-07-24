@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 204b6c8bf855d421d8e598f3701b84fd, type: 3}
-  m_Name: ING_PixieDust
+  m_Name: ING_Eggplant
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
-  displayName: Pixie Dust
-  slot: 2
-  jarSprite: {fileID: 21300000, guid: 8eebc997a377d48d7b9fb9e3fc80eea8, type: 3}
+  displayName: Eggplant
+  slot: 1
+  jarSprite: {fileID: 21300000, guid: 919355d137720453f8d517185f9091f7, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
   dishSprite: {fileID: 0}
   startsLocked: 0
-  placeholderColor: {r: 0.7, g: 0.85, b: 1, a: 1}
+  placeholderColor: {r: 0.55, g: 0.3, b: 0.65, a: 1}

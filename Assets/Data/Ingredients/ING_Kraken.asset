@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
   displayName: Kraken
   slot: 0
-  jarSprite: {fileID: 0}
+  jarSprite: {fileID: 21300000, guid: 94e20d72ccb804f668ba6b1248e1818b, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
+  dishSprite: {fileID: -3884275782305752274, guid: 53d8015915bb240aba99a0846604c9e9, type: 3}
   startsLocked: 0
   placeholderColor: {r: 0.2, g: 0.7, b: 0.7, a: 1}

@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientSO
   displayName: Rat King
   slot: 0
-  jarSprite: {fileID: 0}
+  jarSprite: {fileID: 21300000, guid: df7aded929afd4ea99f3596e0e07bf70, type: 3}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
+  dishSprite: {fileID: -1132288143806231121, guid: 89514c47182f1488cb4cf13408b847c0, type: 3}
   startsLocked: 0
-  placeholderColor: {r: 1, g: 0.6, b: 0.7, a: 1}
+  placeholderColor: {r: 1, g: 1, b: 1, a: 1}

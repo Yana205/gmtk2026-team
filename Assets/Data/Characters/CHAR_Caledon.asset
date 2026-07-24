@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: CHAR_Caledon
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSO
   displayName: Caledon
-  portrait: {fileID: 0}
-  main: {fileID: 11400000, guid: 836984558612740968e558ca67aa0150, type: 2}
+  portrait: {fileID: 21300000, guid: 8f28dee70d6f24cdb9383ce9595149b9, type: 3}
+  main: {fileID: 11400000, guid: 97deed0de91e84432b982592c00c84e1, type: 2}
   side: {fileID: 11400000, guid: 45af2a90cb65a4acb95c17467ad5a000, type: 2}
   sauce: {fileID: 11400000, guid: b40318efda5f1459aab568a26f9ccd84, type: 2}
   napkinText: "Delicious. My siblings were all expert killers, and we often dined

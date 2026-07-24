@@ -15,6 +15,8 @@ public class IngredientSO : ScriptableObject
     public Sprite stewSprite;
     [Tooltip("Prop worn by the customer bust")]
     public Sprite wornSprite;
+    [Tooltip("Whole-bowl served dish — set on Main ingredients only (the FINAL STEW art)")]
+    public Sprite dishSprite;
 
     [Header("Unlock")]
     [Tooltip("True for Kraken, Dragon, Pixie Dust — hidden until their unlock beat")]
