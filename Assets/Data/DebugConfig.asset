@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a91d4780efee4e58acc4b6d100e8532, type: 3}
+  m_Name: DebugConfig
+  m_EditorClassIdentifier: Assembly-CSharp::DebugConfigSO
+  masterEnabled: 1
+  logStateTransitions: 1
+  showOverlay: 1
+  screenSwitchHotkey: 0
+  skipIntro: 0
+  unlockAllJarsAtStart: 0
+  nightSpeedMultiplier: 1
