@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,11 @@ public class BustDresser : MonoBehaviour
     [SerializeField] private Image sauceLayer;  // Sauce (face-level accessory)
     [SerializeField] private Image face;        // optional (portrait can skip it)
 
+    [Header("Grey-box name labels (optional — real art replaces these)")]
+    [SerializeField] private TMP_Text hatLabel;
+    [SerializeField] private TMP_Text sideLabel;
+    [SerializeField] private TMP_Text sauceLabel;
+
     [Header("Face sprites (optional in grey-box)")]
     [SerializeField] private Sprite faceNeutral;
     [SerializeField] private Sprite faceHappy;
@@ -19,9 +25,9 @@ public class BustDresser : MonoBehaviour
 
     public void Dress(Dictionary<SlotType, IngredientSO> order)
     {
-        SetLayer(hatLayer,   order, SlotType.Main);
-        SetLayer(sideLayer,  order, SlotType.Side);
-        SetLayer(sauceLayer, order, SlotType.Sauce);
+        SetLayer(hatLayer,   hatLabel,   order, SlotType.Main);
+        SetLayer(sideLayer,  sideLabel,  order, SlotType.Side);
+        SetLayer(sauceLayer, sauceLabel, order, SlotType.Sauce);
         if (face && faceNeutral) face.sprite = faceNeutral;
     }
 
@@ -32,13 +38,21 @@ public class BustDresser : MonoBehaviour
         if (s) face.sprite = s;
     }
 
-    private void SetLayer(Image img, Dictionary<SlotType, IngredientSO> order, SlotType slot)
+    private void SetLayer(Image img, TMP_Text label, Dictionary<SlotType, IngredientSO> order, SlotType slot)
     {
         bool has = order != null && order.TryGetValue(slot, out var ing) && ing != null;
         img.enabled = has;
+        if (label) label.enabled = has;
         if (!has) return;
         var i = order[slot];
         img.sprite = i.wornSprite;
         img.color  = i.wornSprite ? Color.white : i.placeholderColor;
+        if (label)
+        {
+            label.text = i.displayName;
+            // readable on any placeholder tint
+            float lum = 0.299f * img.color.r + 0.587f * img.color.g + 0.114f * img.color.b;
+            label.color = lum > 0.5f ? new Color(.12f, .10f, .08f) : new Color(.95f, .93f, .88f);
+        }
     }
 }

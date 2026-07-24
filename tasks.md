@@ -18,33 +18,33 @@ explicit approval first (see Decisions D1–D2 in PROGRESS.md).
 
 ## Phase 1 — M0 project setup
 
-1. [ ] **Relocate scripts into the real project layout.**
+1. [x] **Relocate scripts into the real project layout.**
    Move `Assets/generatedPlan1/tavern-stew/Assets/Scripts/{Data,Core,Tavern,Kitchen}` →
    `Assets/Scripts/{Data,Core,Tavern,Kitchen}` (move, not copy — a copy would leave duplicate
    classes that break compilation). Copy `BUILD_PLAN.md` and `.gitignore` to the project root.
    No `.meta` files exist yet in the plan folder, so the move is clean.
    **Verify:** folder tree matches the plan's tree; `generatedPlan1` keeps only the doc + gitignore.
 
-2. [ ] **Project settings: Active Input Handling → "Both".** (depends on: 1)
+2. [x] **Project settings: Active Input Handling → "Both".** (depends on: 1)
    `ProjectSettings.asset` currently has `activeInputHandler: 1` (Input System only). DebugOverlay
    uses legacy `Input.GetKeyDown` and would throw at runtime. Plan M0 requires "Both" (= 2).
    **Verify:** grep shows `activeInputHandler: 2`; Unity opens without input errors.
 
-3. [ ] **Headless compile + import check.** (depends on: 1, 2)
+3. [x] **Headless compile + import check.** (depends on: 1, 2)
    Run Unity batch-mode (`-batchmode -quit`) to import the moved scripts and compile.
    **Verify:** log shows 0 compile errors; `.meta` files generated under `Assets/Scripts`.
 
-4. [ ] **Import TMP Essentials.** (depends on: 3)
+4. [x] **Import TMP Essentials.** (depends on: 3)
    Batch-import `TMP Essential Resources.unitypackage` from the uGUI package (plan M0: first TMP use).
    **Verify:** `Assets/TextMesh Pro/` exists with default font asset.
 
-5. [ ] **git init + initial commit.** (Yan's call — plan M0 says "git init, commit every milestone";
+5. [x] **git init + initial commit.** (Yan's call — plan M0 says "git init, commit every milestone";
    no repo exists today.)
    **Verify:** `git log` shows the initial commit; Library/Temp ignored.
 
 ## Phase 2 — Data layer (SO assets)
 
-6. [ ] **Create the 15 SO assets with plan values.** (depends on: 3)
+6. [x] **Create the 15 SO assets with plan values.** (depends on: 3)
    Editor script `CreateDataAssets` creates `Assets/Data/{GameConfig,TavernFeel,KitchenFeel,StoryData,DebugConfig}.asset`
    and `Assets/Data/Ingredients/ING_*.asset` ×10 (displayName / slot / startsLocked / placeholderColor
    from the plan table). StoryData: toast lines from plan, unlockBeats index-aligned with {60,105,135},
@@ -55,7 +55,7 @@ explicit approval first (see Decisions D1–D2 in PROGRESS.md).
 
 ## Phase 3 — Scene, prefab, wiring
 
-7. [ ] **Build `Assets/Scenes/Main.unity` hierarchy (grey-box).** (depends on: 6)
+7. [x] **Build `Assets/Scenes/Main.unity` hierarchy (grey-box).** (depends on: 6)
    Editor script `BuildMainScene`: Camera, EventSystem (Input System UI module), `Systems` GO with
    GameManager/ScreenManager/NightClock/CustomerGenerator/PatienceMeter **+ HintSystem** (plan's
    wiring checklist includes HintSystem but its hierarchy omits it — Systems is the always-active
@@ -68,12 +68,12 @@ explicit approval first (see Decisions D1–D2 in PROGRESS.md).
    unlocked before then.
    **Verify:** Yan opens Main.unity and walks the hierarchy against the plan's tree.
 
-8. [ ] **Jar prefab + 10 shelf instances.** (depends on: 7)
+8. [x] **Jar prefab + 10 shelf instances.** (depends on: 7)
    `Assets/Prefabs/Jar.prefab` = Button + IngredientJar + icon Image + TMP name label. 10 instances
    under Shelf (HorizontalLayoutGroup), each assigned its IngredientSO + StewBuilder + KitchenFeel.
    **Verify:** prefab exists; 10 labeled jars under Shelf, ingredients assigned in order.
 
-9. [ ] **Wire every serialized slot + the 5 Button.onClick rows.** (depends on: 8)
+9. [x] **Wire every serialized slot + the 5 Button.onClick rows.** (depends on: 8)
    Editor script `WireScene` fills the full checklist from the plan (GameManager 17 slots,
    ScreenManager, NightClock, CustomerGenerator allIngredients ×10, CustomerView, both BustDressers,
    PatienceMeter, ReactionFX, ToastBanner, NapkinPile, NotePanel, HintSystem, EndScreen, StewBuilder,
@@ -81,13 +81,13 @@ explicit approval first (see Decisions D1–D2 in PROGRESS.md).
    Customer→OnCustomerClicked, NotePanel Prev/Next/Close, Retry→EndScreen.Retry.
    **Verify:** Task 10's audit + Yan spot-checks GameManager and StewBuilder in the Inspector.
 
-10. [ ] **Automated empty-slot audit.** (depends on: 9)
+10. [x] **Automated empty-slot audit.** (depends on: 9)
     Editor script `AuditSlots` reflection-scans every `[SerializeField]` on all scene components and
     reports empty slots ("an empty inspector slot = a visible bug"), whitelisting the plan's
     optional ones (debug slots, timeLabel/candleFill in grey-box, kitchenFill, face sprites).
     **Verify:** audit output = zero missing required slots.
 
-11. [ ] **Build Settings: Main.unity as scene 0.** (depends on: 7)
+11. [x] **Build Settings: Main.unity as scene 0.** (depends on: 7)
     Currently only SampleScene is listed. `EndScreen.Retry` reloads by buildIndex — a scene not in
     Build Settings has index −1 and Retry would throw. Keep or delete SampleScene (Yan's call).
     **Verify:** EditorBuildSettings lists Main.unity first.
@@ -108,3 +108,14 @@ explicit approval first (see Decisions D1–D2 in PROGRESS.md).
 
 14. [ ] **WebGL build (Gzip + decompression fallback), test in Chrome, milestone commit.** (depends on: 12)
     **Verify:** build loads in Chrome, full night playable, then commit.
+
+## Phase 5 — Playtest round 1 (Yan, 2026-07-24): readability + design mode + lore napkins
+
+15. [x] **Design-mode timer freeze.** `DebugConfigSO.freezeTimers` (+ guards in NightClock,
+    PatienceMeter). ON by default in the asset — untick in the Inspector during Play Mode to
+    resume time pressure.
+16. [x] **Readable customer (layout v2).** One simple body rect; 3 separated worn slots with
+    ingredient-name labels (BustDresser extension, auto-contrast); MAIN/SIDE/SAUCE captions on
+    both screens; shelf grouped into labeled sections; pot + menu book captioned.
+17. [x] **Reaction-napkin lore.** Served customers leave a napkin (line by hearts + guest name +
+    score) on the pile; opens in NotePanel. `[WRITER TEXT]` placeholders pending real lines.

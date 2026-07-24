@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb93ea502d8214b0d90fde26aa728f89, type: 3}
+  m_Name: StoryData
+  m_EditorClassIdentifier: Assembly-CSharp::StoryDataSO
+  introLine1: "[WRITER TEXT \u2014 paste verbatim] (intro line 1)"
+  introLine2: "[WRITER TEXT \u2014 paste verbatim] (intro line 2)"
+  endingLinesByRank:
+  - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank C)"
+  - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank B)"
+  - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank A)"
+  - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank S)"
+  lastCallBanner: LAST CALL! Coins x2
+  unlockBeats:
+  - ingredientToUnlock: {fileID: 11400000, guid: 496daac1643464433b5ffbc7b09da4d8, type: 2}
+    toastLine: 'Letitia dropped off today''s kill: KRAKEN!'
+    hasNapkin: 1
+    guestName: Letitia
+    napkinText: "[WRITER TEXT \u2014 paste verbatim] (Letitia's seafood note)"
+    idealStew:
+    - {fileID: 11400000, guid: 496daac1643464433b5ffbc7b09da4d8, type: 2}
+    - {fileID: 11400000, guid: 3e98d78c09a2d499ba0896874eb9c0ed, type: 2}
+    - {fileID: 11400000, guid: 752edbfa5f8ee427db37dfdfba587e4c, type: 2}
+  - ingredientToUnlock: {fileID: 11400000, guid: ad1ccbfc57a2e433e8937814aee3063e, type: 2}
+    toastLine: 'Milog dropped off today''s kill: DRAGON!'
+    hasNapkin: 1
+    guestName: Milog
+    napkinText: "[WRITER TEXT \u2014 paste verbatim] (Milog's quest note)"
+    idealStew:
+    - {fileID: 11400000, guid: c2bcf3b319eb6401cb1bfc12fa6fca31, type: 2}
+    - {fileID: 11400000, guid: 45af2a90cb65a4acb95c17467ad5a000, type: 2}
+    - {fileID: 11400000, guid: b0de079e6072346e78eaaf256364d6d8, type: 2}
+  - ingredientToUnlock: {fileID: 11400000, guid: b40318efda5f1459aab568a26f9ccd84, type: 2}
+    toastLine: 'New on the shelf: PIXIE DUST'
+    hasNapkin: 0
+    guestName: 
+    napkinText: 
+    idealStew: []
+  napkinHeader: Tell us what you thought of the food!
+  reactionNapkinsGood:
+  - "[WRITER TEXT \u2014 paste verbatim] Best stew this side of the mountains!"
+  - "[WRITER TEXT \u2014 paste verbatim] Three perfect flavors. I'm telling everyone."
+  - "[WRITER TEXT \u2014 paste verbatim] The cook read my soul."
+  reactionNapkinsMid:
+  - "[WRITER TEXT \u2014 paste verbatim] Decent... but something was off."
+  - "[WRITER TEXT \u2014 paste verbatim] Half right. I've had worse."
+  reactionNapkinsBad:
+  - "[WRITER TEXT \u2014 paste verbatim] That was NOT what I asked for."
+  - "[WRITER TEXT \u2014 paste verbatim] My compliments to nobody."
+  guestNamePool:
+  - '[Guest] Borin'
+  - '[Guest] Saphra'
+  - '[Guest] Tuk'
+  - '[Guest] Mirelle'
+  - '[Guest] Old Fenwick'
+  - '[Guest] Jassa'

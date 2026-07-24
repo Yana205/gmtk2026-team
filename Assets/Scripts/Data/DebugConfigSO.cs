@@ -14,6 +14,8 @@ public class DebugConfigSO : ScriptableObject
     public bool showOverlay = true;
     [Tooltip("TAB flips tavern/kitchen in Play Mode, ignoring all game locks (layout tool)")]
     public bool screenSwitchHotkey = true;
+    [Tooltip("Design mode: night clock + patience stand still; untick in Play Mode when you want time pressure back")]
+    public bool freezeTimers = false;
 
     [Header("Test cheats")]
     [Tooltip("Skip the intro card, night starts immediately")]
@@ -27,6 +29,7 @@ public class DebugConfigSO : ScriptableObject
     public bool LogsOn      => masterEnabled && logStateTransitions;
     public bool OverlayOn   => masterEnabled && showOverlay;
     public bool HotkeyOn    => masterEnabled && screenSwitchHotkey;
+    public bool FreezeOn    => masterEnabled && freezeTimers;
     public bool SkipIntroOn => masterEnabled && skipIntro;
     public bool AllJarsOn   => masterEnabled && unlockAllJarsAtStart;
     public float ClockSpeed => masterEnabled ? nightSpeedMultiplier : 1f;

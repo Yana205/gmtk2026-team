@@ -158,6 +158,8 @@ public class GameManager : MonoBehaviour
         totalHearts += result.hearts;
         totalCoins  += result.coins;
         customersServed++;
+        var lore = story.MakeReactionNapkin(result.hearts, result.coins, customersServed);
+        if (lore != null) napkins.Add(lore);      // served customers leave a note behind
         dishOnCounter.SetActive(false);
         customerView.ShowReaction(result.hearts);
         reactionFX.Play(result.hearts, result.coins);

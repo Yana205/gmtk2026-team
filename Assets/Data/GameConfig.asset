@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b65c4678b7a146d891c83dbd3a7973b, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: Assembly-CSharp::GameConfigSO
+  nightSeconds: 180
+  lastCallSeconds: 30
+  patienceSeconds: 20
+  patienceBonusThreshold: 0.5
+  delayBetweenCustomers: 0.5
+  minSlotsToServe: 3
+  coinsPerHeart: 5
+  patienceBonusCoins: 2
+  lastCallMultiplier: 2
+  rankThresholds: 00000000080000000e00000014000000
+  rankLetters:
+  - C
+  - B
+  - A
+  - S
+  unlockTimes:
+  - 60
+  - 105
+  - 135

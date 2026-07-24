@@ -9,6 +9,7 @@ public class PatienceMeter : MonoBehaviour
     [Header("Data")]
     [SerializeField] private GameConfigSO config;
     [SerializeField] private TavernFeelSO feel;
+    [SerializeField] private DebugConfigSO debug;   // optional — freezeTimers
 
     [Header("Spine")]
     [SerializeField] private GameManager gameManager;   // read Paused only
@@ -41,6 +42,7 @@ public class PatienceMeter : MonoBehaviour
     private void Update()
     {
         if (!draining || gameManager.Paused) return;   // napkin open = patience frozen too
+        if (debug && debug.FreezeOn) return;           // design mode — nobody gets impatient
         Fraction -= Time.deltaTime / config.patienceSeconds;
         if (Fraction <= 0f)
         {
