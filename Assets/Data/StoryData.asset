@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb93ea502d8214b0d90fde26aa728f89, type: 3}
   m_Name: StoryData
   m_EditorClassIdentifier: Assembly-CSharp::StoryDataSO
-  introLine1: "[WRITER TEXT \u2014 paste verbatim] (intro line 1)"
-  introLine2: "[WRITER TEXT \u2014 paste verbatim] (intro line 2)"
+  introLine1: "Every night Yasika feeds the wanderers of the road, until the candle
+    dies and the memories come back. Tonight, keep the pot full \u2014 and her thoughts
+    quiet."
+  introLine2: 
   endingLinesByRank:
   - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank C)"
   - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank B)"

@@ -23,6 +23,19 @@ public class BustDresser : MonoBehaviour
     [SerializeField] private Sprite faceHappy;
     [SerializeField] private Sprite faceSad;
 
+    [Header("Portrait mode — whole-character art (real visitors). Hides the dressing layers.")]
+    [SerializeField] private Image portraitImage;   // the bust Base image
+
+    // Real named visitor: show their one hand-drawn portrait, hide the procedural dressing.
+    public void ShowPortrait(Sprite sprite, Color fallbackTint)
+    {
+        Dress(null);                 // disables hat/side/sauce layers + their labels
+        if (!portraitImage) return;
+        portraitImage.enabled = true;
+        portraitImage.sprite  = sprite;
+        portraitImage.color   = sprite ? Color.white : fallbackTint;
+    }
+
     public void Dress(Dictionary<SlotType, IngredientSO> order)
     {
         SetLayer(hatLayer,   hatLabel,   order, SlotType.Main);

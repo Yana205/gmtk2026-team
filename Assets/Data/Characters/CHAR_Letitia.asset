@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 710bdbdc8c0da4838b30587fdcc6ba19, type: 3}
+  m_Name: CHAR_Letitia
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSO
+  displayName: Letitia
+  portrait: {fileID: 0}
+  main: {fileID: 11400000, guid: 496daac1643464433b5ffbc7b09da4d8, type: 2}
+  side: {fileID: 11400000, guid: 3e98d78c09a2d499ba0896874eb9c0ed, type: 2}
+  sauce: {fileID: 11400000, guid: 752edbfa5f8ee427db37dfdfba587e4c, type: 2}
+  napkinText: Gods, do I love seafood! Takes me back to when ma' and I went catching
+    fish by the dock when I was little. Tastes just like she used to make.

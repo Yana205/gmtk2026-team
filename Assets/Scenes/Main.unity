@@ -6806,6 +6806,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e962d390c7c241e7a16f1318d34947d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerGenerator
+  visitors:
+  - {fileID: 11400000, guid: 8af0f5bb7ab13495aa835fbe2364eac4, type: 2}
+  - {fileID: 11400000, guid: c1fa8858bc1c1440196ce917f731d3a8, type: 2}
+  - {fileID: 11400000, guid: d3d66558c34814dd2bd4ec0218221c47, type: 2}
   allIngredients:
   - {fileID: 11400000, guid: 836984558612740968e558ca67aa0150, type: 2}
   - {fileID: 11400000, guid: c2bcf3b319eb6401cb1bfc12fa6fca31, type: 2}
@@ -10259,6 +10263,7 @@ MonoBehaviour:
   faceNeutral: {fileID: 0}
   faceHappy: {fileID: 0}
   faceSad: {fileID: 0}
+  portraitImage: {fileID: 178542987}
 --- !u!114 &1799380905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12235,6 +12240,7 @@ MonoBehaviour:
   faceNeutral: {fileID: 0}
   faceHappy: {fileID: 0}
   faceSad: {fileID: 0}
+  portraitImage: {fileID: 787324928}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

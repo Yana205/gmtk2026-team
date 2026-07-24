@@ -27,7 +27,4 @@ MonoBehaviour:
   - B
   - A
   - S
-  unlockTimes:
-  - 60
-  - 105
-  - 135
+  unlockTimes: []

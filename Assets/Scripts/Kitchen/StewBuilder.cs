@@ -47,9 +47,12 @@ public class StewBuilder : MonoBehaviour
         Clear();
     }
 
-    public void BeginCooking(Dictionary<SlotType, IngredientSO> order)
+    public void BeginCooking(Dictionary<SlotType, IngredientSO> order, CharacterSO character)
     {
-        portrait.Dress(order);   // the customer follows you into the kitchen
+        // The customer follows you into the kitchen. Real visitors show their portrait (their look is
+        // the only clue — the dressed answer would give the recipe away); grey-box falls back to dressing.
+        if (character != null) portrait.ShowPortrait(character.portrait, new Color(0.6f, 0.6f, 0.65f, 1f));
+        else                   portrait.Dress(order);
     }
 
     public void UnlockJar(IngredientSO ing)

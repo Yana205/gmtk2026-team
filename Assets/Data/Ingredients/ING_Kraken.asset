@@ -17,5 +17,5 @@ MonoBehaviour:
   jarSprite: {fileID: 0}
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
-  startsLocked: 1
+  startsLocked: 0
   placeholderColor: {r: 0.2, g: 0.7, b: 0.7, a: 1}
