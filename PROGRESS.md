@@ -3,8 +3,39 @@
 Anchor files: `tasks.md` (what to do) · `BUILD_PLAN.md` (how it must be done) · this file (where we are).
 Updated by Claude after every change and after each of Yan's reviews.
 
-**Last updated:** 2026-07-24 — Tasks 1–11 executed via Unity MCP. Grey-box skeleton is playable
-end-to-end (verified in Play Mode by driving a full night through the MCP). Awaiting Yan's review.
+**Last updated:** 2026-07-24 (playtest round 1) — Yan played, called the first layout unreadable.
+Layout v2 + design-mode timer freeze + reaction-napkin lore shipped and screenshot-verified.
+Awaiting Yan's second look.
+
+## Playtest round 1 changes (Yan-directed, 2026-07-24)
+
+Yan's feedback: hideous; customer should be a simple rectangle with placeholders; the player can't
+read what the customer wants or map it to jars; timers should stand still while designing; served
+customers should react and leave a clickable lore napkin.
+
+**Script changes (Yan-requested — the "final scripts" freeze was lifted for exactly these):**
+- `DebugConfigSO` + `NightClock` + `PatienceMeter`: new **freezeTimers** debug flag ("design
+  mode"). Currently **ON** in `DebugConfig.asset`: clock + patience stand perfectly still in Play
+  Mode; untick it live in the Inspector to feel time pressure again (SO edits persist).
+- `BustDresser`: 3 optional TMP name labels — each worn slot now shows its ingredient's name with
+  auto-contrast text on the placeholder tint. Real art later = leave labels empty.
+- `StoryDataSO` + `GameManager`: every SERVED customer leaves a **reaction napkin** (good/mid/bad
+  line picked by hearts + guest name from a pool + score line) on the existing napkin pile —
+  clickable through the existing NotePanel. Angry walk-outs leave nothing. Placeholder lines are
+  bracketed `[WRITER TEXT]`; guest names bracketed `[Guest]` (writer to replace both).
+
+**Layout v2 (scene rebuild, screenshot-verified):**
+- Customer = ONE simple body rect + 3 separated worn slots (hat / chest / waist), each labeled
+  with the ingredient name, with static `MAIN > / SIDE > / SAUCE >` captions beside them.
+- Shelf regrouped into labeled **MAIN | SIDE | SAUCE** sections (locked jars leave visible gaps).
+- Kitchen portrait enlarged, captioned **THE ORDER**, mirrors the customer with named slots.
+- Pot captioned "THE POT — click jars to fill it"; thought bubble says "food?"; MenuBook is a big
+  captioned call-to-action ("click to start cooking").
+- No face rect in grey-box (BustDresser.face stays empty — null-safe, audit whitelisted).
+
+**Verified in Play Mode (screenshots + driven loop):** timers static at 3:00 in Ordering ·
+labels readable on all 10 tints · full serve loop · lore napkin appears on pile, opens with
+guest + lore + score, pauses the world · audit PASS.
 
 ## Task board
 

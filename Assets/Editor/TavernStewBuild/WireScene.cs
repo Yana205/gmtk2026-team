@@ -82,21 +82,12 @@ namespace TavernStewBuild
                 ("rect", (RectTransform)customerT),
                 ("thoughtBubble", TSBUtil.FindGO("TavernScreen/Customer/ThoughtBubble")));
 
-            TSBUtil.Wire(customerBust,
-                ("hatLayer", TSBUtil.Find<Image>("TavernScreen/Customer/HatLayer")),
-                ("sideLayer", TSBUtil.Find<Image>("TavernScreen/Customer/SideLayer")),
-                ("sauceLayer", TSBUtil.Find<Image>("TavernScreen/Customer/SauceLayer")),
-                ("face", TSBUtil.Find<Image>("TavernScreen/Customer/Face")));
-            // face sprites stay empty in grey-box (optional per plan)
-
-            TSBUtil.Wire(portraitBust,
-                ("hatLayer", TSBUtil.Find<Image>("CookingScreen/Portrait/HatLayer")),
-                ("sideLayer", TSBUtil.Find<Image>("CookingScreen/Portrait/SideLayer")),
-                ("sauceLayer", TSBUtil.Find<Image>("CookingScreen/Portrait/SauceLayer")));
-            // portrait face stays empty per plan
+            WireDresser(customerBust, "TavernScreen/Customer");
+            WireDresser(portraitBust, "CookingScreen/Portrait");
+            // face image + face sprites stay empty in grey-box (layout v2 has no face rect)
 
             TSBUtil.Wire(patience,
-                ("config", config), ("feel", tavernFeel), ("gameManager", gm),
+                ("config", config), ("feel", tavernFeel), ("debug", dbg), ("gameManager", gm),
                 ("tavernBarRoot", TSBUtil.FindGO("TavernScreen/PatienceBar")),
                 ("tavernFill", TSBUtil.Find<Image>("TavernScreen/PatienceBar/Fill")),
                 ("kitchenFill", TSBUtil.Find<Image>("CookingScreen/KitchenPatienceFill")));
@@ -156,12 +147,7 @@ namespace TavernStewBuild
                 ("serveButton", serveBtn),
                 ("portrait", portraitBust));
             var shelf = TSBUtil.FindT("CookingScreen/Shelf");
-            var jarComps = new List<Object>();
-            foreach (Transform c in shelf)
-            {
-                var jc = c.GetComponent<IngredientJar>();
-                if (jc) jarComps.Add(jc);
-            }
+            var jarComps = new List<Object>(shelf.GetComponentsInChildren<IngredientJar>(true));
             if (jarComps.Count != 10)
                 throw new System.Exception("[TSB] Expected 10 jars under Shelf, found " + jarComps.Count);
             TSBUtil.WireArray(stew, "jars", jarComps.ToArray());
@@ -183,6 +169,17 @@ namespace TavernStewBuild
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[TSB] All serialized slots + onClick rows wired.");
+        }
+
+        private static void WireDresser(BustDresser bust, string basePath)
+        {
+            TSBUtil.Wire(bust,
+                ("hatLayer", TSBUtil.Find<Image>(basePath + "/HatLayer")),
+                ("sideLayer", TSBUtil.Find<Image>(basePath + "/SideLayer")),
+                ("sauceLayer", TSBUtil.Find<Image>(basePath + "/SauceLayer")),
+                ("hatLabel", TSBUtil.Find<TMP_Text>(basePath + "/HatLayer/Label")),
+                ("sideLabel", TSBUtil.Find<TMP_Text>(basePath + "/SideLayer/Label")),
+                ("sauceLabel", TSBUtil.Find<TMP_Text>(basePath + "/SauceLayer/Label")));
         }
 
         private static void Click(Button b, UnityEngine.Events.UnityAction action)

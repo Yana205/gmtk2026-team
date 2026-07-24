@@ -20,6 +20,29 @@ public class StoryDataSO : ScriptableObject
     [Header("Printed on every napkin")]
     public string napkinHeader = "Tell us what you thought of the food!";
 
+    [Header("Reaction napkins — lore left by every served customer, picked by hearts")]
+    [TextArea(1, 3)] public string[] reactionNapkinsGood;   // 3 hearts
+    [TextArea(1, 3)] public string[] reactionNapkinsMid;    // 1-2 hearts
+    [TextArea(1, 3)] public string[] reactionNapkinsBad;    // 0 hearts (served, all wrong)
+    [Tooltip("Guest names cycle in order as customers are served")]
+    public string[] guestNamePool;
+
+    // Data-owned lookup: null when no lines are authored yet (feature stays dormant).
+    public UnlockBeat MakeReactionNapkin(int hearts, int coins, int servedCount)
+    {
+        string[] pool = hearts >= 3 ? reactionNapkinsGood : hearts > 0 ? reactionNapkinsMid : reactionNapkinsBad;
+        if (pool == null || pool.Length == 0) return null;
+        var beat = new UnlockBeat
+        {
+            hasNapkin  = true,
+            guestName  = guestNamePool != null && guestNamePool.Length > 0
+                         ? guestNamePool[servedCount % guestNamePool.Length] : "A customer",
+            napkinText = pool[Random.Range(0, pool.Length)]
+                         + "\n\n(" + hearts + "/3 hearts · +" + coins + " coins)",
+        };
+        return beat;
+    }
+
     [System.Serializable]
     public class UnlockBeat
     {

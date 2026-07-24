@@ -11,6 +11,7 @@ namespace TavernStewBuild
     {
         private static readonly HashSet<string> Optional = new HashSet<string>
         {
+            "BustDresser.face",          // layout v2: no face rect in grey-box
             "BustDresser.faceNeutral",   // face sprites optional in grey-box
             "BustDresser.faceHappy",
             "BustDresser.faceSad",

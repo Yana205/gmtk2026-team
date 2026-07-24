@@ -108,3 +108,14 @@ explicit approval first (see Decisions D1–D2 in PROGRESS.md).
 
 14. [ ] **WebGL build (Gzip + decompression fallback), test in Chrome, milestone commit.** (depends on: 12)
     **Verify:** build loads in Chrome, full night playable, then commit.
+
+## Phase 5 — Playtest round 1 (Yan, 2026-07-24): readability + design mode + lore napkins
+
+15. [x] **Design-mode timer freeze.** `DebugConfigSO.freezeTimers` (+ guards in NightClock,
+    PatienceMeter). ON by default in the asset — untick in the Inspector during Play Mode to
+    resume time pressure.
+16. [x] **Readable customer (layout v2).** One simple body rect; 3 separated worn slots with
+    ingredient-name labels (BustDresser extension, auto-contrast); MAIN/SIDE/SAUCE captions on
+    both screens; shelf grouped into labeled sections; pot + menu book captioned.
+17. [x] **Reaction-napkin lore.** Served customers leave a napkin (line by hearts + guest name +
+    score) on the pile; opens in NotePanel. `[WRITER TEXT]` placeholders pending real lines.

@@ -41,6 +41,7 @@ public class NightClock : MonoBehaviour
     {
         if (!Running) return;
         if (gameManager.Paused) return;   // napkin open — the world holds its breath
+        if (debug && debug.FreezeOn) return;   // design mode — the night stands still
 
         SecondsLeft -= Time.deltaTime * (debug ? debug.ClockSpeed : 1f);
 

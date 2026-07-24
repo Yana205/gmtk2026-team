@@ -89,8 +89,44 @@ namespace TavernStewBuild
                 EditorUtility.SetDirty(story);
             }
 
+            UpgradeForPlaytestRound1(story, dbg);
+
             AssetDatabase.SaveAssets();
             Debug.Log("[TSB] Data assets ready: 5 config SOs + 10 ingredients.");
+        }
+
+        // Yan's playtest round 1 (2026-07-24): reaction-napkin lore + design-mode timer freeze.
+        // Only fills fields that are still empty, so pasted writer text is never clobbered.
+        private static void UpgradeForPlaytestRound1(StoryDataSO story, DebugConfigSO dbg)
+        {
+            if (story.reactionNapkinsGood == null || story.reactionNapkinsGood.Length == 0)
+            {
+                story.reactionNapkinsGood = new[]
+                {
+                    W + " Best stew this side of the mountains!",
+                    W + " Three perfect flavors. I'm telling everyone.",
+                    W + " The cook read my soul.",
+                };
+                story.reactionNapkinsMid = new[]
+                {
+                    W + " Decent... but something was off.",
+                    W + " Half right. I've had worse.",
+                };
+                story.reactionNapkinsBad = new[]
+                {
+                    W + " That was NOT what I asked for.",
+                    W + " My compliments to nobody.",
+                };
+                story.guestNamePool = new[]
+                {
+                    "[Guest] Borin", "[Guest] Saphra", "[Guest] Tuk",
+                    "[Guest] Mirelle", "[Guest] Old Fenwick", "[Guest] Jassa",
+                };
+                EditorUtility.SetDirty(story);
+            }
+
+            dbg.freezeTimers = true;   // design mode ON — Yan unticks it live when tuning pressure
+            EditorUtility.SetDirty(dbg);
         }
 
         private static T Create<T>(string path, out bool fresh) where T : ScriptableObject

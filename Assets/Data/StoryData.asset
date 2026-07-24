@@ -46,3 +46,20 @@ MonoBehaviour:
     napkinText: 
     idealStew: []
   napkinHeader: Tell us what you thought of the food!
+  reactionNapkinsGood:
+  - "[WRITER TEXT \u2014 paste verbatim] Best stew this side of the mountains!"
+  - "[WRITER TEXT \u2014 paste verbatim] Three perfect flavors. I'm telling everyone."
+  - "[WRITER TEXT \u2014 paste verbatim] The cook read my soul."
+  reactionNapkinsMid:
+  - "[WRITER TEXT \u2014 paste verbatim] Decent... but something was off."
+  - "[WRITER TEXT \u2014 paste verbatim] Half right. I've had worse."
+  reactionNapkinsBad:
+  - "[WRITER TEXT \u2014 paste verbatim] That was NOT what I asked for."
+  - "[WRITER TEXT \u2014 paste verbatim] My compliments to nobody."
+  guestNamePool:
+  - '[Guest] Borin'
+  - '[Guest] Saphra'
+  - '[Guest] Tuk'
+  - '[Guest] Mirelle'
+  - '[Guest] Old Fenwick'
+  - '[Guest] Jassa'
