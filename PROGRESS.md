@@ -11,7 +11,7 @@ end-to-end (verified in Play Mode by driving a full night through the MCP). Awai
 | # | Task | Status | Notes |
 |---|------|--------|-------|
 | 1 | Relocate scripts + docs to project layout | ⏳ awaiting Yan's review | Executed 2026-07-24 |
-| 2 | Active Input Handling → Both | ⏳ awaiting Yan's review | `activeInputHandler: 2` on disk; needs ONE editor restart to take effect (see D5) |
+| 2 | Active Input Handling → Both | ⚠ needs Yan | Scripted write insufficient on Unity 6000.4 — one UI flip needed (see D5) |
 | 3 | Headless compile + import check | ⏳ awaiting Yan's review | 0 compile errors via MCP |
 | 4 | Import TMP Essentials | ⏳ awaiting Yan's review | `Assets/TextMesh Pro/` present |
 | 5 | git init + initial commit | ✅ done | Repo already existed (main+dev on origin) |
@@ -44,11 +44,21 @@ Legend: ○ pending · ▶ in progress · ⏳ awaiting Yan's review · ✅ done 
   ⚠ NOTE: nothing in the 22 scripts reads `StoryData.introLine1/2` at runtime — the IntroPanel's
   two TMP labels are static scene text. When the writer text lands, paste it into BOTH StoryData
   AND `OverlayCanvas/IntroPanel/Line1+Line2` (or approve a 3-line reader script as a deviation).
-- **D5 — NEW: TAB hotkey parked OFF until one editor restart.** `activeInputHandler=2` ("Both")
-  is written to disk but only applies after the editor restarts. Until then, DebugOverlay's
-  legacy `Input.GetKeyDown(Tab)` would throw every frame, so `DebugConfig.screenSwitchHotkey`
-  was created as **false**. After restarting the editor once: tick it back on. Everything else
-  in the debug rig (overlay, speed, logs) is on and works now.
+- **D5 — NEW: TAB hotkey parked OFF; "Both" input handling needs Yan's UI flip.**
+  `activeInputHandler: 2` is written to `ProjectSettings.asset` and survives restarts, BUT on
+  Unity 6000.4 the scripted write (SerializedObject — the standard recipe) does NOT update the
+  native `disableOldInputManagerSupport` state: verified after a genuine editor relaunch that
+  `ENABLE_LEGACY_INPUT_MANAGER` is still off and legacy `Input.GetKeyDown` still throws.
+  Two ways out, Yan picks one:
+  1. **UI flip (10s, no code):** Edit → Project Settings → Player → Other Settings →
+     Active Input Handling → re-select "Both" → let the editor restart. Then tick
+     `DebugConfig.screenSwitchHotkey` back on.
+  2. **Code deviation (2 lines, needs approval like D1):** replace DebugOverlay's
+     `Input.GetKeyDown(KeyCode.Tab)` with the Input System equivalent
+     (`Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame`) — then "Both"
+     isn't needed at all and the deprecated legacy input path stays off for WebGL.
+  Until then `DebugConfig.screenSwitchHotkey` stays **false** (game fully playable — TAB is a
+  layout convenience only). Everything else in the debug rig (overlay, speed, logs) works now.
 
 ## Smoke test log (2026-07-24, Claude via MCP, full night driven in Play Mode)
 
@@ -80,6 +90,10 @@ Legend: ○ pending · ▶ in progress · ⏳ awaiting Yan's review · ✅ done 
 
 ## Change log
 
+- 2026-07-24 (later) — Input-handling investigation: quit + relaunched the editor to apply
+  "Both"; confirmed Unity 6000.4 ignores the scripted `activeInputHandler` write for the
+  native legacy-input gate (D5 updated with the two fixes). DebugConfig left safe:
+  hotkey off, speed 1×. Editor regenerated QualitySettings (v5 format) + NuGet dll meta.
 - 2026-07-24 — **Tasks 2–11 executed** via Unity MCP + disposable editor scripts under
   `Assets/Editor/TavernStewBuild/` (TSBUtil, CreateDataAssets, BuildMainScene, CreateJarPrefab,
   WireScene, AuditSlots — reviewable, rerunnable, delete after M1):
