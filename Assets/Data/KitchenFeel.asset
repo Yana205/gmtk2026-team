@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KitchenFeelSO
   jarPunchScale: 1.12
   jarPunchSeconds: 0.12
+  jarHoverScale: 1.0933
   arcSeconds: 0.35
   arcHeight: 140
   potBouncePixels: 12
