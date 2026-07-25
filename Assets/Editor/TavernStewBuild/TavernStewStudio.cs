@@ -368,10 +368,44 @@ public class TavernStewStudio : EditorWindow
     // SOs (or the jars) and update the running tweens LIVE while you're in Play mode.
     void DrawEffects()
     {
-        Header("Effects — motion & juice (drag in Play mode to feel it live)");
+        Header("Effects — motion & juice");
         var tf = FindSO<TavernFeelSO>();
         var kf = KitchenFeel();
-        EditorGUILayout.HelpBox("These drive runtime animation. Press Play, then drag — the sliders retune the tweens without leaving Play.", MessageType.Info);
+
+        // ---- Preview (no Play mode needed) ----
+        EditorGUILayout.LabelField("▶ Preview — replay an effect right here in edit mode, then tune & replay", EditorStyles.miniBoldLabel);
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            using (new EditorGUI.DisabledScope(CustView() == null || tf == null))
+            {
+                EditorGUILayout.LabelField("Tavern customer", EditorStyles.miniLabel);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Entrance"))   PreviewEntrance(tf);
+                    if (GUILayout.Button("Idle bob"))   PreviewIdle(tf);
+                    if (GUILayout.Button("Happy hop"))  PreviewHop(tf);
+                    if (GUILayout.Button("Sad droop"))  PreviewDroop(tf);
+                }
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Happy exit → reappear")) PreviewExit(tf, true);
+                    if (GUILayout.Button("Sad exit → reappear"))   PreviewExit(tf, false);
+                    if (GUILayout.Button("Reset to rest", GUILayout.Width(100))) PreviewReset();
+                }
+            }
+            using (new EditorGUI.DisabledScope(kf == null))
+            {
+                EditorGUILayout.LabelField("Kitchen juice", EditorStyles.miniLabel);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Jar punch"))  PreviewJarPunch(kf);
+                    if (GUILayout.Button("Serve pop"))  PreviewServePop(kf);
+                }
+            }
+            EditorGUILayout.LabelField("Plays on the open scene in edit mode — no need to press Play. Also works while playing.", EditorStyles.miniLabel);
+        }
+        EditorGUILayout.Space(4);
+        EditorGUILayout.HelpBox("Sliders below also retune the LIVE tweens if you drag them during Play mode.", MessageType.None);
 
         EditorGUILayout.LabelField("Customer bust — entrance · idle · exit  (TavernFeelSO)", EditorStyles.miniBoldLabel);
         if (tf == null) EditorGUILayout.HelpBox("No TavernFeelSO found in the project.", MessageType.Warning);
@@ -445,6 +479,157 @@ public class TavernStewStudio : EditorWindow
         }
     }
 
+    // ---------- edit-mode effect preview pump ----------
+    // Coroutines don't tick outside Play mode, so we drive one timed tween from EditorApplication.update,
+    // using timeSinceStartup as the clock and repainting the views each frame. One preview at a time.
+    static double fxStart;
+    static float  fxDur;
+    static System.Action<float> fxStep;   // receives elapsed seconds
+    static System.Action fxDone;
+    static Vector2 fxHome; static bool fxHomeSet;
+
+    static void PlayTimed(float seconds, System.Action<float> stepElapsed, System.Action done)
+    {
+        StopFX();
+        fxDur = Mathf.Max(0.01f, seconds);
+        fxStart = EditorApplication.timeSinceStartup;
+        fxStep = stepElapsed; fxDone = done;
+        EditorApplication.update += FXTick;
+    }
+
+    static void StopFX()
+    {
+        EditorApplication.update -= FXTick;
+        fxStep = null; fxDone = null;
+    }
+
+    static void FXTick()
+    {
+        float e = (float)(EditorApplication.timeSinceStartup - fxStart);
+        bool last = e >= fxDur;
+        try { fxStep?.Invoke(Mathf.Min(e, fxDur)); }
+        catch { StopFX(); return; }                       // scene object went away — bail cleanly
+        UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+        if (last) { var d = fxDone; StopFX(); d?.Invoke(); Dirty(); }
+    }
+
+    // customer bust pieces (private serialized on CustomerView)
+    static (CanvasGroup grp, RectTransform rect) CustBits()
+    {
+        var cv = CustView();
+        if (!cv) return (null, null);
+        var so = new SerializedObject(cv);
+        return (so.FindProperty("group").objectReferenceValue as CanvasGroup,
+                so.FindProperty("rect").objectReferenceValue as RectTransform);
+    }
+
+    // Put a visitor on-screen at rest (home captured once) before previewing a bust effect.
+    (CanvasGroup grp, RectTransform rect) ReadyBust()
+    {
+        ShowView(true);
+        var chars = Characters();
+        if (chars.Count > 0) PreviewVisitor(chars[Mathf.Clamp(visitorIndex, 0, chars.Count - 1)]);
+        var (grp, rect) = CustBits();
+        if (rect != null)
+        {
+            StopFX();
+            if (fxHomeSet) rect.anchoredPosition = fxHome;
+            else { fxHome = rect.anchoredPosition; fxHomeSet = true; }
+        }
+        if (grp) grp.alpha = 1f;
+        return (grp, rect);
+    }
+
+    void PreviewReset()
+    {
+        var (grp, rect) = ReadyBust();
+        if (rect != null) rect.anchoredPosition = fxHome;
+        if (grp) grp.alpha = 1f;
+        Dirty();
+    }
+
+    void PreviewEntrance(TavernFeelSO tf)
+    {
+        var (grp, rect) = ReadyBust(); if (rect == null) return;
+        Vector2 home = fxHome, start = home + Vector2.down * tf.enterRisePixels;
+        float dur = tf.fadeInSeconds;
+        PlayTimed(dur, e => {
+            float p = tf.easeCurve.Evaluate(Mathf.Clamp01(e / dur));
+            rect.anchoredPosition = Vector2.LerpUnclamped(start, home, p);
+            if (grp) grp.alpha = Mathf.Clamp01(p);
+        }, () => { rect.anchoredPosition = home; if (grp) grp.alpha = 1f; });
+    }
+
+    void PreviewIdle(TavernFeelSO tf)
+    {
+        var (_, rect) = ReadyBust(); if (rect == null) return;
+        Vector2 home = fxHome;
+        PlayTimed(3f, e => {                              // demo a few cycles then settle back
+            float y = Mathf.Sin(e / Mathf.Max(0.01f, tf.idleBobSeconds) * Mathf.PI * 2f) * tf.idleBobPixels;
+            rect.anchoredPosition = home + Vector2.up * y;
+        }, () => rect.anchoredPosition = home);
+    }
+
+    void PreviewHop(TavernFeelSO tf)
+    {
+        var (_, rect) = ReadyBust(); if (rect == null) return;
+        Vector2 home = fxHome; float dur = tf.happyHopSeconds;
+        PlayTimed(dur, e => {
+            float p = tf.easeCurve.Evaluate(Mathf.Clamp01(e / dur));
+            rect.anchoredPosition = home + Vector2.up * (tf.happyHopHeight * 4f * p * (1f - p));
+        }, () => rect.anchoredPosition = home);
+    }
+
+    void PreviewDroop(TavernFeelSO tf)
+    {
+        var (_, rect) = ReadyBust(); if (rect == null) return;
+        Vector2 home = fxHome, low = home + Vector2.down * tf.sadDroopPixels; float dur = tf.sadDroopSeconds;
+        PlayTimed(dur, e => {
+            float p = tf.easeCurve.Evaluate(Mathf.Clamp01(e / dur));
+            rect.anchoredPosition = Vector2.LerpUnclamped(home, low, p);
+        }, null);                                         // stays drooped like the real 0-heart beat — press Reset to bring it back
+    }
+
+    void PreviewExit(TavernFeelSO tf, bool happy)
+    {
+        var (grp, rect) = ReadyBust(); if (rect == null) return;
+        Vector2 home = fxHome, to = home + (happy ? Vector2.up : Vector2.down) * tf.exitDriftPixels;
+        float dur = tf.fadeOutSeconds;
+        PlayTimed(dur, e => {
+            float p = tf.easeCurve.Evaluate(Mathf.Clamp01(e / dur));
+            rect.anchoredPosition = Vector2.LerpUnclamped(home, to, p);
+            if (grp) grp.alpha = Mathf.Clamp01(1f - p);
+        }, () => { rect.anchoredPosition = home; if (grp) grp.alpha = 1f; });   // reappear at rest so you can replay
+    }
+
+    // Generic scale punch preview (same curve as Tween.Punch) for a kitchen transform.
+    void PreviewPunch(Transform tr, float scale, float seconds)
+    {
+        if (!tr) return;
+        Vector3 baseScale = tr.localScale; float amp = scale - 1f;
+        PlayTimed(seconds, e => {
+            float p = Mathf.Clamp01(e / Mathf.Max(0.01f, seconds));
+            float f = p < 0.3f ? Mathf.SmoothStep(0f, 1f, p / 0.3f)
+                               : Mathf.Cos((p - 0.3f) / 0.7f * Mathf.PI * 1.5f) * (1f - (p - 0.3f) / 0.7f);
+            tr.localScale = baseScale * (1f + amp * f);
+        }, () => tr.localScale = baseScale);
+    }
+
+    void PreviewJarPunch(KitchenFeelSO kf)
+    {
+        ShowView(false);
+        var jar = Jars().FirstOrDefault();
+        if (jar) PreviewPunch(jar.transform, kf.jarPunchScale, kf.jarPunchSeconds);
+    }
+
+    void PreviewServePop(KitchenFeelSO kf)
+    {
+        ShowView(false);
+        var stew = Scene<StewBuilder>().FirstOrDefault();
+        var btn = stew ? new SerializedObject(stew).FindProperty("serveButton").objectReferenceValue as Button : null;
+        if (btn) PreviewPunch(btn.transform, kf.servePopScale, kf.servePopSeconds);
+    }
+
     // ---------- Tab: Night & Pace ----------
     // The desk candle (night timer) + the tempo knobs. Candle preview is edit-mode only; the
     // GameConfig/DebugConfig knobs also drive Play Mode live (they write to the SO).
@@ -486,7 +671,7 @@ public class TavernStewStudio : EditorWindow
         else
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                SOToggle(dbg, "❄ Freeze the night — clock & patience stand still (design mode)", dbg.freezeTimers, v => dbg.freezeTimers = v);
+                SOToggle(dbg, "❄ Freeze the night — clock stands still (design mode)", dbg.freezeTimers, v => dbg.freezeTimers = v);
                 SOToggle(dbg, "⏩ Skip intro — the night starts the moment you press Play", dbg.skipIntro, v => dbg.skipIntro = v);
                 SOSlider(dbg, "Night speed ×  (4 ≈ whole night in ~45s)", dbg.nightSpeedMultiplier, 1f, 10f, v => dbg.nightSpeedMultiplier = v);
             }
@@ -497,7 +682,6 @@ public class TavernStewStudio : EditorWindow
         {
             SOSlider(cfg, "Night length (s)",           cfg.nightSeconds,          60f, 600f, v => cfg.nightSeconds = v);
             SOSlider(cfg, "Last call at (s left)",       cfg.lastCallSeconds,       10f, 60f,  v => cfg.lastCallSeconds = v);
-            SOSlider(cfg, "Patience per customer (s)",   cfg.patienceSeconds,       5f, 60f,   v => cfg.patienceSeconds = v);
             SOSlider(cfg, "Delay between customers (s)", cfg.delayBetweenCustomers, 0f, 3f,    v => cfg.delayBetweenCustomers = v);
             int m = Mathf.FloorToInt(cfg.nightSeconds / 60f), s = Mathf.FloorToInt(cfg.nightSeconds % 60f);
             EditorGUILayout.LabelField($"→ a full night runs {m}:{s:00}", EditorStyles.miniLabel);

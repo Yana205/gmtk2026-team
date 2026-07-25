@@ -78,7 +78,6 @@ namespace TavernStewBuild
             Sys(systems, "ScreenManager").AddComponent<ScreenManager>();
             Sys(systems, "NightClock").AddComponent<NightClock>();
             Sys(systems, "CustomerGenerator").AddComponent<CustomerGenerator>();
-            Sys(systems, "PatienceMeter").AddComponent<PatienceMeter>();
             Sys(systems, "HintSystem").AddComponent<HintSystem>();   // D3
         }
 
@@ -188,16 +187,6 @@ namespace TavernStewBuild
             TSBUtil.Label("SubLabel", menu.transform, new Vector2(0f, -70f), new Vector2(360f, 40f),
                 "click to start cooking", 22f, new Color(1f, 1f, 1f, .55f));
 
-            // PatienceBar — hidden root, horizontal fill, above the (centered) customer
-            var bar = TSBUtil.Child("PatienceBar", t);
-            TSBUtil.Place(bar, new Vector2(0f, 400f), new Vector2(340f, 30f));
-            TSBUtil.Stretch("BG", bar.transform, new Color(.10f, .09f, .08f));
-            var fill = TSBUtil.Box("Fill", bar.transform, Vector2.zero, new Vector2(330f, 22f),
-                new Color(.45f, .75f, .35f)).GetComponent<Image>();
-            fill.type = Image.Type.Filled;
-            fill.fillMethod = Image.FillMethod.Horizontal;
-            fill.fillAmount = 1f;
-            bar.SetActive(false);
 
             // NapkinPile — BOTTOM-RIGHT, on the desk. Button surface = the (hidden) PileVisual.
             var pileGo = TSBUtil.Child("NapkinPile", t);
@@ -253,14 +242,6 @@ namespace TavernStewBuild
             WornSlot("SideLayer", portrait.transform, new Vector2(0f, -35f), new Vector2(160f, 46f), 20f);
             WornSlot("SauceLayer", portrait.transform, new Vector2(0f, -115f), new Vector2(130f, 40f), 18f);
             portrait.AddComponent<BustDresser>();
-
-            var kFill = TSBUtil.Box("KitchenPatienceFill", k, new Vector2(200f, -430f), new Vector2(220f, 16f),
-                new Color(.45f, .75f, .35f)).GetComponent<Image>();
-            var kFillRt = (RectTransform)kFill.transform;
-            kFillRt.anchorMin = kFillRt.anchorMax = new Vector2(0f, 1f);
-            kFill.type = Image.Type.Filled;
-            kFill.fillMethod = Image.FillMethod.Horizontal;
-            kFill.fillAmount = 1f;
 
             // Shelf — RIGHT side, 3-column MAIN | SIDE | SAUCE matrix. Jars land here in task 8 at
             // fixed cell positions (manual, so locked jars leave a visible gap in their column).

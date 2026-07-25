@@ -18,6 +18,8 @@ public class IngredientJar : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [Header("Pieces")]
     [SerializeField] private Image icon;
     [SerializeField] private TMP_Text nameLabel;   // shown on hover only
+    [Tooltip("Gold frame shown while this jar is the current pick for its slot")]
+    [SerializeField] private GameObject selectedFrame;
 
     [Header("Locked look")]
     [Tooltip("Silhouette tint for a not-yet-unlocked catch of the day")]
@@ -36,6 +38,13 @@ public class IngredientJar : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             nameLabel.enabled = false;             // hidden until hover
         }
         GetComponent<Button>().onClick.AddListener(OnClick);
+        if (selectedFrame) selectedFrame.SetActive(false);
+    }
+
+    // The "it's in the pot" marker — StewBuilder turns exactly one on per slot.
+    public void SetSelected(bool value)
+    {
+        if (selectedFrame) selectedFrame.SetActive(value);
     }
 
     // Locked = black silhouette of the jar art + not clickable. Unlocked = full colour + clickable.

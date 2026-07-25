@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,17 +33,31 @@ public class StewBuilder : MonoBehaviour
     [Header("Serve")]
     [SerializeField] private Button serveButton;
 
+    [Header("Pick feedback — shelf headers count 0/1 per slot, pot caption lists the contents")]
+    [SerializeField] private TMP_Text mainHeader;
+    [SerializeField] private TMP_Text sideHeader;
+    [SerializeField] private TMP_Text sauceHeader;
+    [SerializeField] private TMP_Text potCaption;
+    [SerializeField] private Color headerDoneColor = new Color(1f, 0.82f, 0.35f, 1f);
+
     [Header("Portrait — second BustDresser instance, small, top corner")]
     [SerializeField] private BustDresser portrait;
 
     private readonly Dictionary<SlotType, IngredientSO> picks = new Dictionary<SlotType, IngredientSO>();
     private Vector2 potHome;
     private bool serveWasOn;
+    private string headerBaseMain, headerBaseSide, headerBaseSauce, potCaptionBase;
+    private Color headerRestColor;
 
     private void Awake()
     {
         potHome = potRect.anchoredPosition;
         serveButton.onClick.AddListener(() => gameManager.SubmitDish(picks));
+        // Remember the authored header/caption text so the counters append to it instead of replacing it.
+        if (mainHeader)  { headerBaseMain  = mainHeader.text;  headerRestColor = mainHeader.color; }
+        if (sideHeader)    headerBaseSide  = sideHeader.text;
+        if (sauceHeader)   headerBaseSauce = sauceHeader.text;
+        if (potCaption)    potCaptionBase  = potCaption.text;
         Clear();
     }
 
@@ -71,6 +87,7 @@ public class StewBuilder : MonoBehaviour
     {
         picks[ing.slot] = ing;                          // 1. state first — same slot overwrites
         RedrawPot();                                    // 2. pot shows the truth
+        RefreshPickFeedback();                          //    ...and so do the jars + headers
         StartCoroutine(FlyRoutine(ing, fromJar));       // 3. fire-and-forget juice
         RefreshServeGate();                             // 4. gate
     }
@@ -79,8 +96,39 @@ public class StewBuilder : MonoBehaviour
     {
         picks.Clear();
         RedrawPot();
+        RefreshPickFeedback();
         serveWasOn = false;
         serveButton.interactable = config.minSlotsToServe == 0;
+    }
+
+    // One frame per slot: the picked jar wears the gold frame, its header flips to "1/1",
+    // and the pot caption spells out exactly what's inside.
+    private void RefreshPickFeedback()
+    {
+        foreach (var jar in jars)
+        {
+            var ing = jar.Ingredient;
+            jar.SetSelected(ing && picks.TryGetValue(ing.slot, out var picked) && picked == ing);
+        }
+        RefreshHeader(mainHeader,  headerBaseMain,  SlotType.Main);
+        RefreshHeader(sideHeader,  headerBaseSide,  SlotType.Side);
+        RefreshHeader(sauceHeader, headerBaseSauce, SlotType.Sauce);
+        if (potCaption)
+        {
+            var sb = new StringBuilder();
+            foreach (var slot in new[] { SlotType.Main, SlotType.Side, SlotType.Sauce })
+                if (picks.TryGetValue(slot, out var p) && p)
+                    sb.Append(sb.Length > 0 ? "  ·  " : "").Append(p.displayName);
+            potCaption.text = sb.Length > 0 ? sb.ToString() : potCaptionBase;
+        }
+    }
+
+    private void RefreshHeader(TMP_Text header, string baseText, SlotType slot)
+    {
+        if (!header) return;
+        bool done = picks.ContainsKey(slot);
+        header.text  = baseText + (done ? "  1/1" : "  0/1");
+        header.color = done ? headerDoneColor : headerRestColor;
     }
 
     private void RefreshServeGate()

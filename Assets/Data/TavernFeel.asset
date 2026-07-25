@@ -12,17 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4d1925a78f8545a58f04b7e894db173, type: 3}
   m_Name: TavernFeel
   m_EditorClassIdentifier: Assembly-CSharp::TavernFeelSO
-  fadeInSeconds: 0.35
+  fadeInSeconds: 0.32
   fadeOutSeconds: 0.25
   happyHopHeight: 30
   happyHopSeconds: 0.3
   sadDroopPixels: 15
   happyFaceMinHearts: 3
+  enterRisePixels: 70
+  exitDriftPixels: 60
+  sadDroopSeconds: 0.35
+  idleBobPixels: 5
+  idleBobSeconds: 2.2
   reactionTotalSeconds: 1.2
   heartPopInterval: 0.15
   heartPopScale: 1.3
   coinFlySeconds: 0.5
   coinRisePixels: 60
+  heartFullColor: {r: 0.9, g: 0.25, b: 0.35, a: 1}
+  heartEmptyColor: {r: 0.35, g: 0.35, b: 0.4, a: 0.5}
   warningThreshold: 0.3
   barColorFull: {r: 0.45, g: 0.75, b: 0.35, a: 1}
   barColorWarning: {r: 0.85, g: 0.3, b: 0.25, a: 1}

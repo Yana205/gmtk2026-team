@@ -30,7 +30,6 @@ namespace TavernStewBuild
             var screens  = TSBUtil.Find<ScreenManager>("Systems/ScreenManager");
             var clock    = TSBUtil.Find<NightClock>("Systems/NightClock");
             var gen      = TSBUtil.Find<CustomerGenerator>("Systems/CustomerGenerator");
-            var patience = TSBUtil.Find<PatienceMeter>("Systems/PatienceMeter");
             var hints    = TSBUtil.Find<HintSystem>("Systems/HintSystem");
 
             // tavern
@@ -59,7 +58,7 @@ namespace TavernStewBuild
                 ("screens", screens), ("nightClock", clock),
                 ("generator", gen), ("customerView", customerView),
                 ("dishOnCounter", TSBUtil.FindGO("TavernScreen/DishOnCounter")),
-                ("reactionFX", reactionFX), ("patience", patience), ("toast", toast),
+                ("reactionFX", reactionFX), ("toast", toast),
                 ("napkins", napkinPile), ("endScreen", endScreen),
                 ("introPanel", TSBUtil.FindGO("OverlayCanvas/IntroPanel")),
                 ("stewBuilder", stew), ("menuBookButton", menuBookBtn), ("customerButton", customerBtn));
@@ -85,12 +84,6 @@ namespace TavernStewBuild
             WireDresser(customerBust, "TavernScreen/Customer");
             WireDresser(portraitBust, "CookingScreen/Portrait");
             // face image + face sprites stay empty in grey-box (layout v2 has no face rect)
-
-            TSBUtil.Wire(patience,
-                ("config", config), ("feel", tavernFeel), ("debug", dbg), ("gameManager", gm),
-                ("tavernBarRoot", TSBUtil.FindGO("TavernScreen/PatienceBar")),
-                ("tavernFill", TSBUtil.Find<Image>("TavernScreen/PatienceBar/Fill")),
-                ("kitchenFill", TSBUtil.Find<Image>("CookingScreen/KitchenPatienceFill")));
 
             TSBUtil.Wire(reactionFX,
                 ("feel", tavernFeel),

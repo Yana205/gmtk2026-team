@@ -37,12 +37,6 @@ public class TavernFeelSO : ScriptableObject
     public Color heartFullColor  = new Color(0.90f, 0.25f, 0.35f, 1f);
     public Color heartEmptyColor = new Color(0.35f, 0.35f, 0.40f, 0.5f);
 
-    [Header("Patience bar — read by PatienceMeter")]
-    [Tooltip("Fraction below which the bar turns urgent")]
-    [Range(0f, 1f)] public float warningThreshold = 0.3f;
-    public Color barColorFull    = new Color(0.45f, 0.75f, 0.35f);
-    public Color barColorWarning = new Color(0.85f, 0.30f, 0.25f);
-
     [Header("Banners & toasts — read by ToastBanner")]
     [Range(0.05f, 1f)] public float bannerSlideSeconds = 0.25f;
     [Range(0.5f, 5f)]  public float toastHoldSeconds = 2.5f;

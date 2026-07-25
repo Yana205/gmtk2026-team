@@ -14,7 +14,7 @@ public class DebugConfigSO : ScriptableObject
     public bool showOverlay = true;
     [Tooltip("TAB flips tavern/kitchen in Play Mode, ignoring all game locks (layout tool)")]
     public bool screenSwitchHotkey = true;
-    [Tooltip("Design mode: night clock + patience stand still; untick in Play Mode when you want time pressure back")]
+    [Tooltip("Design mode: night clock stands still; untick in Play Mode when you want time pressure back")]
     public bool freezeTimers = false;
 
     [Header("Test cheats")]

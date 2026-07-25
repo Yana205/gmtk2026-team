@@ -8,11 +8,6 @@ public class GameConfigSO : ScriptableObject
     [Range(60f, 600f)] public float nightSeconds = 180f;
     [Range(10f, 60f)]  public float lastCallSeconds = 30f;
 
-    [Header("Patience")]
-    [Range(5f, 60f)] public float patienceSeconds = 20f;
-    [Tooltip("Patience fraction above which the bonus coins fire")]
-    [Range(0f, 1f)]  public float patienceBonusThreshold = 0.5f;
-
     [Header("Pacing")]
     [Tooltip("Breathing room between one customer leaving and the next entering")]
     [Range(0f, 3f)] public float delayBetweenCustomers = 0.5f;
@@ -23,7 +18,6 @@ public class GameConfigSO : ScriptableObject
 
     [Header("Coins")]
     public int coinsPerHeart = 5;
-    public int patienceBonusCoins = 2;
     public int lastCallMultiplier = 2;
 
     [Header("Ranks — total hearts needed, index-aligned with rankLetters")]
