@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,11 +17,13 @@ public class StewBuilder : MonoBehaviour
     [Header("Spine")]
     [SerializeField] private GameManager gameManager;
 
-    [Header("Pot — one overlay Image per slot")]
+    [Header("Pot — one overlay Image per slot (only shown when real stew art exists)")]
     [SerializeField] private Image mainLayer;
     [SerializeField] private Image sideLayer;
     [SerializeField] private Image sauceLayer;
     [SerializeField] private RectTransform potRect;
+    [Tooltip("Text list of what's been added — replaces the greybox colored rectangles")]
+    [SerializeField] private TMP_Text potContents;
 
     [Header("Shelf — all 10 jars")]
     [SerializeField] private List<IngredientJar> jars;
@@ -90,15 +94,33 @@ public class StewBuilder : MonoBehaviour
         SetLayer(mainLayer,  SlotType.Main);
         SetLayer(sideLayer,  SlotType.Side);
         SetLayer(sauceLayer, SlotType.Sauce);
+        RedrawContents();
     }
 
+    // Simple text of what's in the pot — the greybox rectangles are gone.
+    private void RedrawContents()
+    {
+        if (!potContents) return;
+        var sb = new StringBuilder();
+        AppendPick(sb, SlotType.Main);
+        AppendPick(sb, SlotType.Side);
+        AppendPick(sb, SlotType.Sauce);
+        potContents.text = sb.Length == 0 ? "<i>empty pot</i>" : sb.ToString().TrimEnd();
+    }
+
+    private void AppendPick(StringBuilder sb, SlotType slot)
+    {
+        if (picks.TryGetValue(slot, out var ing) && ing) sb.AppendLine("+ " + ing.displayName);
+    }
+
+    // Only ever show a pot overlay when there is REAL stew art — never a placeholder rectangle.
     private void SetLayer(Image img, SlotType slot)
     {
-        bool has = picks.TryGetValue(slot, out var ing);
-        img.enabled = has;
-        if (!has) return;
+        bool hasArt = picks.TryGetValue(slot, out var ing) && ing && ing.stewSprite;
+        if (img) img.enabled = hasArt;
+        if (!hasArt) return;
         img.sprite = ing.stewSprite;
-        img.color  = ing.stewSprite ? Color.white : ing.placeholderColor;
+        img.color  = Color.white;
     }
 
     private IEnumerator FlyRoutine(IngredientSO ing, RectTransform fromJar)

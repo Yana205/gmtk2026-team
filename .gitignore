@@ -124,3 +124,9 @@ $RECYCLE.BIN/
 # -----------------------------------------------------------------------------
 .claude/settings.local.json
 .claude/**/settings.local.json
+
+# WebGL / player builds (snapshots for itch.io — not committed)
+/Builds/
+
+# Stray WebGL build artifact dropped at project root
+/Data/

@@ -25,7 +25,12 @@ public class TavernStewStudio : EditorWindow
     float nudge = 20f;
     bool showUnlocks;
     bool showPortraitSize = true;
+    bool showKitchenPortraitSize;
     bool showDishSize;
+    bool showTextTools = true;
+    int textIndex;
+    float bulkJarPct = 100f;
+    float bulkJarFont = 24f;
 
     // ---------- asset lookups ----------
     static List<T> LoadAll<T>(string folder) where T : Object =>
@@ -51,10 +56,24 @@ public class TavernStewStudio : EditorWindow
         return go ? go.transform.Find("Dish")?.GetComponent<Image>() : null;
     }
 
-    static Image PortraitImage()
+    // Bust portrait images for ONE screen. Tavern (the main interaction) and Kitchen (a small corner
+    // portrait) size independently, so we filter busts by which screen root they live under.
+    static Image[] PortraitImages(bool tavern)
     {
-        var bust = Busts().FirstOrDefault();
-        return bust ? new SerializedObject(bust).FindProperty("portraitImage").objectReferenceValue as Image : null;
+        string key = tavern ? "TavernScreen" : "CookingScreen";
+        return Busts().Where(b => PathOf(b.transform).Contains(key))
+                      .Select(b => new SerializedObject(b).FindProperty("portraitImage").objectReferenceValue as Image)
+                      .Where(i => i != null).Distinct().ToArray();
+    }
+
+    static TMP_FontAsset UiFont()     => AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/CormorantGaramond SDF.asset");
+    static TMP_FontAsset NapkinFont() => AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/Caveat SDF.asset");
+
+    static string PathOf(Transform t)
+    {
+        string p = t.name;
+        while (t.parent) { t = t.parent; p = t.name + "/" + p; }
+        return p;
     }
 
     // ---------- view switching (Tavern ⇄ Kitchen) ----------
@@ -134,6 +153,7 @@ public class TavernStewStudio : EditorWindow
         scroll = EditorGUILayout.BeginScrollView(scroll);
         DrawCharacterLevel();
         DrawIngredients();
+        DrawTextTools();
         EditorGUILayout.EndScrollView();
     }
 
@@ -205,9 +225,13 @@ public class TavernStewStudio : EditorWindow
             }
         }
 
-        // Portrait proportions (as it sits in the tavern bust)
-        showPortraitSize = EditorGUILayout.Foldout(showPortraitSize, "Portrait size & proportions (tavern bust)", true);
-        if (showPortraitSize) ProportionControls(PortraitImage(), c.portrait);
+        // Tavern portrait — the big hero, the main interaction.
+        showPortraitSize = EditorGUILayout.Foldout(showPortraitSize, "Tavern portrait size (hero — switch to 🍺 to see it)", true);
+        if (showPortraitSize) FitScale(PortraitImages(true), c.portrait);
+
+        // Kitchen portrait — the small corner portrait; sized independently from the tavern one.
+        showKitchenPortraitSize = EditorGUILayout.Foldout(showKitchenPortraitSize, "Kitchen portrait size (corner — switch to 🍳 to see it)", true);
+        if (showKitchenPortraitSize) FitScale(PortraitImages(false), c.portrait);
 
         // Their order = their preferences
         EditorGUILayout.LabelField("Order — their favorite stew (the answer)", EditorStyles.miniBoldLabel);
@@ -224,7 +248,7 @@ public class TavernStewStudio : EditorWindow
         {
             var dishSprite = c.main ? c.main.dishSprite : null;
             if (c.main && !dishSprite) EditorGUILayout.HelpBox($"{c.main.displayName} has no dishSprite set.", MessageType.None);
-            ProportionControls(DishImage(), dishSprite);
+            FitScale(new[] { DishImage() }, dishSprite);
         }
 
         // Napkin note
@@ -272,43 +296,55 @@ public class TavernStewStudio : EditorWindow
         }
     }
 
-    // ---------- reusable image proportion controls ----------
-    // Works on any UI Image in the scene (portrait, dish, jar icon). All Undo-able, live in edit mode.
-    void ProportionControls(Image img, Sprite refSprite)
+    // ---------- reusable "keep the asset's real proportions, only resize" controls ----------
+    // Drives EVERY passed image at once (e.g. both busts) so edits show live. The golden rule:
+    // the rect is ALWAYS sized to the sprite's native aspect (native px × scale), so it can never
+    // stretch — you only pick how big. Undo-able, writes to the open scene in edit mode.
+    void FitScale(Image[] imgs, Sprite sprite)
     {
-        if (!img) { EditorGUILayout.HelpBox("That image isn't in the open scene right now.", MessageType.None); return; }
-        var rt = img.rectTransform;
+        imgs = imgs?.Where(i => i != null).ToArray() ?? new Image[0];
+        if (imgs.Length == 0) { EditorGUILayout.HelpBox("That image isn't in the open scene right now.", MessageType.None); return; }
+        if (!sprite) { EditorGUILayout.HelpBox("No sprite assigned yet — set one above to resize by its real proportions.", MessageType.None); return; }
+
+        Vector2 native = new Vector2(sprite.rect.width, sprite.rect.height);
+        if (native.y <= 0) return;
+        float aspect = native.x / native.y;
+
+        var rt0 = imgs[0].rectTransform;
+        float curPct = rt0.sizeDelta.y > 0 ? rt0.sizeDelta.y / native.y * 100f : 100f;
+
+        EditorGUILayout.LabelField($"Asset is {native.x:0}×{native.y:0}px  (aspect {aspect:0.00})  •  driving {imgs.Length} image(s)", EditorStyles.miniLabel);
+
+        // Size %, keeping the asset's proportions — this is the "unstretch + only-larger" control.
+        EditorGUI.BeginChangeCheck();
+        float pct = EditorGUILayout.Slider("Size %", curPct, 10f, 400f);
+        if (EditorGUI.EndChangeCheck()) ApplyFit(imgs, native, pct / 100f);
 
         using (new EditorGUILayout.HorizontalScope())
         {
-            EditorGUI.BeginChangeCheck();
-            bool pa = GUILayout.Toggle(img.preserveAspect, "Preserve Aspect", EditorStyles.miniButton, GUILayout.Width(120));
-            if (EditorGUI.EndChangeCheck()) { Undo.RecordObject(img, "Preserve aspect"); img.preserveAspect = pa; EditorUtility.SetDirty(img); Dirty(); }
-
-            if (GUILayout.Button("Native Size", EditorStyles.miniButton, GUILayout.Width(90)))
-            { Undo.RecordObject(rt, "Native size"); img.SetNativeSize(); EditorUtility.SetDirty(rt); Dirty(); }
-
-            using (new EditorGUI.DisabledScope(!refSprite))
-                if (GUILayout.Button("Match aspect (keep height)", EditorStyles.miniButton))
-                    MatchAspect(rt, refSprite);
+            if (GUILayout.Button("Reset to 100% (native)", EditorStyles.miniButton)) ApplyFit(imgs, native, 1f);
+            if (GUILayout.Button("Fit height, keep aspect", EditorStyles.miniButton)) ApplyFit(imgs, native, rt0.sizeDelta.y / native.y);
+            if (GUILayout.Button("−10%", EditorStyles.miniButton, GUILayout.Width(48))) ApplyFit(imgs, native, Mathf.Max(0.1f, curPct - 10f) / 100f);
+            if (GUILayout.Button("+10%", EditorStyles.miniButton, GUILayout.Width(48))) ApplyFit(imgs, native, (curPct + 10f) / 100f);
         }
-
-        EditorGUI.BeginChangeCheck();
-        var size = EditorGUILayout.Vector2Field("Size (W×H px)", rt.sizeDelta);
-        if (EditorGUI.EndChangeCheck()) { Undo.RecordObject(rt, "Resize"); rt.sizeDelta = size; EditorUtility.SetDirty(rt); Dirty(); }
-
-        EditorGUI.BeginChangeCheck();
-        float s = EditorGUILayout.Slider("Uniform scale", rt.localScale.x, 0.1f, 3f);
-        if (EditorGUI.EndChangeCheck()) { Undo.RecordObject(rt, "Scale"); rt.localScale = new Vector3(s, s, 1f); EditorUtility.SetDirty(rt); Dirty(); }
+        EditorGUILayout.LabelField($"→ {rt0.sizeDelta.x:0}×{rt0.sizeDelta.y:0}px", EditorStyles.miniLabel);
     }
 
-    static void MatchAspect(RectTransform rt, Sprite sprite)
+    // Set every image to native-aspect size × scale. preserveAspect on = belt-and-suspenders no-stretch.
+    static void ApplyFit(Image[] imgs, Vector2 native, float scale)
     {
-        var r = sprite.rect;
-        if (r.height <= 0) return;
-        Undo.RecordObject(rt, "Match aspect");
-        rt.sizeDelta = new Vector2(rt.sizeDelta.y * (r.width / r.height), rt.sizeDelta.y);
-        EditorUtility.SetDirty(rt);
+        foreach (var img in imgs)
+        {
+            var rt = img.rectTransform;
+            Undo.RecordObject(rt, "Fit & scale");
+            Undo.RecordObject(img, "Fit & scale");
+            rt.sizeDelta = native * scale;
+            rt.localScale = Vector3.one;
+            img.preserveAspect = true;
+            img.type = Image.Type.Simple;
+            EditorUtility.SetDirty(rt);
+            EditorUtility.SetDirty(img);
+        }
         Dirty();
     }
 
@@ -334,10 +370,87 @@ public class TavernStewStudio : EditorWindow
         }
     }
 
+    // ---------- Kitchen bulk actions (there are a lot of jars) ----------
+    static KitchenFeelSO KitchenFeel() =>
+        AssetDatabase.FindAssets("t:KitchenFeelSO")
+            .Select(g => AssetDatabase.LoadAssetAtPath<KitchenFeelSO>(AssetDatabase.GUIDToAssetPath(g)))
+            .FirstOrDefault();
+
+    static Image JarIcon(IngredientJar jar) => jar ? jar.transform.Find("Icon")?.GetComponent<Image>() : null;
+    static TMP_Text JarLabel(IngredientJar jar) => jar ? jar.transform.Find("NameLabel")?.GetComponent<TMP_Text>() : null;
+
+    void DrawKitchenBulk()
+    {
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            EditorGUILayout.LabelField("Bulk — apply to ALL jars at once", EditorStyles.boldLabel);
+
+            // Size % (each jar keeps its own sprite's proportions)
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                bulkJarPct = EditorGUILayout.Slider("Jar size %", bulkJarPct, 10f, 400f);
+                if (GUILayout.Button("Apply size to all", GUILayout.Width(120))) BulkJarSize(bulkJarPct / 100f);
+                if (GUILayout.Button("Native", GUILayout.Width(60))) BulkJarSize(1f);
+            }
+
+            // Hover effect (data-driven on KitchenFeelSO → every jar reads it at runtime)
+            var feel = KitchenFeel();
+            using (new EditorGUI.DisabledScope(feel == null))
+            {
+                EditorGUI.BeginChangeCheck();
+                float hover = EditorGUILayout.Slider("Hover scale", feel ? feel.jarHoverScale : 1.1f, 1f, 1.5f);
+                if (EditorGUI.EndChangeCheck() && feel)
+                { Undo.RecordObject(feel, "Jar hover scale"); feel.jarHoverScale = hover; EditorUtility.SetDirty(feel); }
+            }
+            if (feel == null) EditorGUILayout.LabelField("(no KitchenFeelSO found — hover uses default 1.1)", EditorStyles.miniLabel);
+
+            // Name-label font size
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                bulkJarFont = EditorGUILayout.FloatField("Jar name font size", bulkJarFont);
+                if (GUILayout.Button("Apply font size to all labels", GUILayout.Width(200))) BulkJarFont(bulkJarFont);
+            }
+        }
+    }
+
+    void BulkJarSize(float scale)
+    {
+        int n = 0;
+        foreach (var jar in Jars())
+        {
+            var icon = JarIcon(jar);
+            var sprite = jar.Ingredient ? jar.Ingredient.jarSprite : null;
+            if (!icon) continue;
+            if (sprite) ApplyFit(new[] { icon }, new Vector2(sprite.rect.width, sprite.rect.height), scale);
+            else { Undo.RecordObject(icon.rectTransform, "Bulk jar size"); icon.rectTransform.sizeDelta = new Vector2(96f, 96f) * scale; EditorUtility.SetDirty(icon.rectTransform); }
+            n++;
+        }
+        Dirty();
+        Debug.Log($"Bulk jar size {scale * 100f:0}% applied to {n} jars.");
+    }
+
+    void BulkJarFont(float size)
+    {
+        int n = 0;
+        foreach (var jar in Jars())
+        {
+            var lbl = JarLabel(jar);
+            if (!lbl) continue;
+            Undo.RecordObject(lbl, "Bulk jar font");
+            lbl.enableAutoSizing = false;
+            lbl.fontSize = size;
+            EditorUtility.SetDirty(lbl);
+            n++;
+        }
+        Dirty();
+        Debug.Log($"Bulk jar font size {size} applied to {n} labels.");
+    }
+
     // ---------- Kitchen ingredients ----------
     void DrawIngredients()
     {
         Header("Kitchen — ingredient art, jar placement & proportions");
+        DrawKitchenBulk();
         nudge = EditorGUILayout.FloatField("Nudge step (px)", nudge);
 
         foreach (var ing in Ingredients())
@@ -368,20 +481,7 @@ public class TavernStewStudio : EditorWindow
                 }
                 ImportFixLine(ing.jarSprite);
 
-                if (icon)
-                {
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        EditorGUI.BeginChangeCheck();
-                        bool pa = GUILayout.Toggle(icon.preserveAspect, "Preserve Aspect", EditorStyles.miniButton, GUILayout.Width(120));
-                        if (EditorGUI.EndChangeCheck()) { Undo.RecordObject(icon, "Preserve aspect"); icon.preserveAspect = pa; EditorUtility.SetDirty(icon); Dirty(); }
-                        if (GUILayout.Button("Native Size", EditorStyles.miniButton, GUILayout.Width(90)))
-                        { Undo.RecordObject(icon.rectTransform, "Native size"); icon.SetNativeSize(); EditorUtility.SetDirty(icon.rectTransform); Dirty(); }
-                        using (new EditorGUI.DisabledScope(!ing.jarSprite))
-                            if (GUILayout.Button("Match aspect", EditorStyles.miniButton, GUILayout.Width(100)))
-                                MatchAspect(icon.rectTransform, ing.jarSprite);
-                    }
-                }
+                if (icon) FitScale(new[] { icon }, ing.jarSprite);
             }
         }
     }
@@ -406,6 +506,79 @@ public class TavernStewStudio : EditorWindow
         rt.anchoredPosition += new Vector2(dx, dy);
         EditorUtility.SetDirty(rt);
         Dirty();
+    }
+
+    // ---------- Text & fonts ----------
+    static TMP_Text[] SceneTexts() => Scene<TMP_Text>().OrderBy(t => PathOf(t.transform)).ToArray();
+
+    // UI = Cormorant Garamond everywhere; anything under NotePanel = Caveat (the handwritten napkin).
+    static void ApplyFontsSmart()
+    {
+        var ui = UiFont(); var napkin = NapkinFont();
+        if (!ui || !napkin) { Debug.LogError("Font assets missing under Assets/Fonts/"); return; }
+        int nUI = 0, nNap = 0;
+        foreach (var t in SceneTexts())
+        {
+            bool isNapkin = PathOf(t.transform).Contains("/NotePanel/");
+            Undo.RecordObject(t, "Apply font");
+            t.font = isNapkin ? napkin : ui;
+            EditorUtility.SetDirty(t);
+            if (isNapkin) nNap++; else nUI++;
+        }
+        Dirty();
+        Debug.Log($"Fonts applied — UI(Cormorant)={nUI}, Napkin(Caveat)={nNap}");
+    }
+
+    void DrawTextTools()
+    {
+        Header("Text & fonts");
+
+        if (!UiFont() || !NapkinFont())
+            EditorGUILayout.HelpBox("Expected Assets/Fonts/CormorantGaramond SDF.asset and Caveat SDF.asset.", MessageType.Warning);
+
+        if (GUILayout.Button("Apply fonts to scene  (UI = Cormorant, napkin = Caveat)", GUILayout.Height(26)))
+            ApplyFontsSmart();
+
+        showTextTools = EditorGUILayout.Foldout(showTextTools, "Edit one text object (font, size, colour, spacing…)", true);
+        if (!showTextTools) return;
+
+        var texts = SceneTexts();
+        if (texts.Length == 0) { EditorGUILayout.HelpBox("No TMP text in the open scene.", MessageType.None); return; }
+        textIndex = Mathf.Clamp(textIndex, 0, texts.Length - 1);
+
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            textIndex = EditorGUILayout.Popup(textIndex, texts.Select(t => PathOf(t.transform)).ToArray());
+            if (GUILayout.Button("Select", GUILayout.Width(60)))
+            { Selection.activeGameObject = texts[textIndex].gameObject; EditorGUIUtility.PingObject(texts[textIndex]); }
+        }
+
+        var txt = texts[textIndex];
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            EditorGUI.BeginChangeCheck();
+            var font    = (TMP_FontAsset)EditorGUILayout.ObjectField("Font", txt.font, typeof(TMP_FontAsset), false);
+            float size  = EditorGUILayout.FloatField("Font size", txt.fontSize);
+            bool auto   = EditorGUILayout.Toggle("Auto size", txt.enableAutoSizing);
+            var color   = EditorGUILayout.ColorField("Colour", txt.color);
+            var align   = (TextAlignmentOptions)EditorGUILayout.EnumPopup("Alignment", txt.alignment);
+            var style   = (FontStyles)EditorGUILayout.EnumFlagsField("Style", txt.fontStyle);
+            float cs    = EditorGUILayout.FloatField("Character spacing", txt.characterSpacing);
+            float ls    = EditorGUILayout.FloatField("Line spacing", txt.lineSpacing);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(txt, "Edit text");
+                txt.font = font; txt.fontSize = size; txt.enableAutoSizing = auto;
+                txt.color = color; txt.alignment = align; txt.fontStyle = style;
+                txt.characterSpacing = cs; txt.lineSpacing = ls;
+                EditorUtility.SetDirty(txt);
+                Dirty();
+            }
+
+            EditorGUI.BeginChangeCheck();
+            var body = EditorGUILayout.TextArea(txt.text, GUILayout.MinHeight(40));
+            if (EditorGUI.EndChangeCheck()) { Undo.RecordObject(txt, "Edit text body"); txt.text = body; EditorUtility.SetDirty(txt); Dirty(); }
+        }
     }
 
     static void Header(string t)

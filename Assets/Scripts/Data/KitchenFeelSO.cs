@@ -9,6 +9,10 @@ public class KitchenFeelSO : ScriptableObject
     [Range(1f, 1.5f)]    public float jarPunchScale   = 1.12f;
     [Range(0.02f, 0.5f)] public float jarPunchSeconds = 0.12f;
 
+    [Header("Jar hover — read by IngredientJar")]
+    [Tooltip("Jar scale while hovered — 1.1 = 10% bigger")]
+    [Range(1f, 1.5f)]    public float jarHoverScale = 1.1f;
+
     [Header("Ingredient arc into the pot — read by StewBuilder")]
     [Range(0.05f, 1.5f)] public float arcSeconds = 0.35f;
     [Range(0f, 400f)]    public float arcHeight  = 140f;
