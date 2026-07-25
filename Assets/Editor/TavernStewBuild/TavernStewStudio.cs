@@ -115,6 +115,9 @@ public class TavernStewStudio : EditorWindow
             }
             var lbl = j.transform.Find("NameLabel")?.GetComponent<TMP_Text>();
             if (lbl) { Undo.RecordObject(lbl, "Apply jar art"); lbl.text = ing.displayName; EditorUtility.SetDirty(lbl); }
+            // the selected marker is a gold silhouette of the same art — keep its sprite in sync
+            var frame = j.transform.Find("SelectedFrame")?.GetComponent<Image>();
+            if (frame) { Undo.RecordObject(frame, "Apply jar art"); frame.sprite = ing.jarSprite; EditorUtility.SetDirty(frame); }
         }
         Dirty();
     }
@@ -931,11 +934,15 @@ public class TavernStewStudio : EditorWindow
             }
             if (feel == null) EditorGUILayout.LabelField("(no KitchenFeelSO found — hover uses default 1.1)", EditorStyles.miniLabel);
 
-            // Name-label font size
+            // Name-label size — labels are autosized hover tooltips, so this drives the autosize
+            // ceiling AND the label box together (a bigger font in the same narrow box would just
+            // re-shrink itself back down).
             using (new EditorGUILayout.HorizontalScope())
             {
-                bulkJarFont = EditorGUILayout.FloatField("Jar name font size", bulkJarFont);
-                if (GUILayout.Button("Apply font size to all labels", GUILayout.Width(200))) BulkJarFont(bulkJarFont);
+                bulkJarFont = EditorGUILayout.Slider("Jar label size", bulkJarFont, 12f, 40f);
+                if (GUILayout.Button("Apply to all labels", GUILayout.Width(140))) BulkJarFont(bulkJarFont);
+                if (GUILayout.Button("−2", GUILayout.Width(34))) { bulkJarFont -= 2f; BulkJarFont(bulkJarFont); }
+                if (GUILayout.Button("+2", GUILayout.Width(34))) { bulkJarFont += 2f; BulkJarFont(bulkJarFont); }
             }
         }
     }
@@ -958,19 +965,28 @@ public class TavernStewStudio : EditorWindow
 
     void BulkJarFont(float size)
     {
+        size = Mathf.Clamp(size, 8f, 60f);
+        bulkJarFont = size;
         int n = 0;
         foreach (var jar in Jars())
         {
             var lbl = JarLabel(jar);
             if (!lbl) continue;
-            Undo.RecordObject(lbl, "Bulk jar font");
-            lbl.enableAutoSizing = false;
-            lbl.fontSize = size;
+            var rt = (RectTransform)lbl.transform;
+            Undo.RecordObject(lbl, "Bulk jar label size");
+            Undo.RecordObject(rt, "Bulk jar label size");
+            lbl.enableAutoSizing = true;                 // keep tooltips shrinking long names to fit
+            lbl.fontSizeMax = size;
+            lbl.fontSizeMin = Mathf.Min(lbl.fontSizeMin, size);
+            lbl.fontSize    = size;
+            // box grows with the font, capped near the jar's width; two lines of headroom
+            rt.sizeDelta = new Vector2(126f, Mathf.Ceil(size * 2.4f));
             EditorUtility.SetDirty(lbl);
+            EditorUtility.SetDirty(rt);
             n++;
         }
         Dirty();
-        Debug.Log($"Bulk jar font size {size} applied to {n} labels.");
+        Debug.Log($"Jar label size {size} (autosize max) applied to {n} labels; boxes resized to 126×{Mathf.Ceil(size * 2.4f)}.");
     }
 
     // ---------- Kitchen ingredients ----------
