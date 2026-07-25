@@ -53,6 +53,7 @@ public class BustDresser : MonoBehaviour
 
     private void SetLayer(Image img, TMP_Text label, Dictionary<SlotType, IngredientSO> order, SlotType slot)
     {
+        if (!img) return;   // optional layer — portrait-only busts (real visitors) leave these unassigned
         bool has = order != null && order.TryGetValue(slot, out var ing) && ing != null;
         img.enabled = has;
         if (label) label.enabled = has;

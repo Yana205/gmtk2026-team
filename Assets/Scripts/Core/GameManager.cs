@@ -27,7 +27,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject dishOnCounter;   // dish + mead mug parent
     [SerializeField] private Image dishImage;            // the bowl — swapped to the Main's whole-dish art
     [SerializeField] private ReactionFX reactionFX;
-    [SerializeField] private PatienceMeter patience;
     [SerializeField] private ToastBanner toast;
     [SerializeField] private NapkinPile napkins;
     [SerializeField] private EndScreen endScreen;
@@ -66,12 +65,12 @@ public class GameManager : MonoBehaviour
         nightClock.OnLastCall    += HandleLastCall;
         nightClock.OnNightEnd    += HandleNightEnd;
         nightClock.OnUnlock      += HandleUnlock;
-        patience.OnPatienceEmpty += HandlePatienceEmpty;
     }
 
     private void Start()
     {
         screens.ShowTavern();
+        dishOnCounter.SetActive(false);   // no bowl on the counter until the first dish is served
         SetState(GameState.Intro);   // intro panel active in scene by default
         if (debug && debug.SkipIntroOn) StartNight();
     }
@@ -101,11 +100,14 @@ public class GameManager : MonoBehaviour
         SetState(GameState.Delivering);
         screens.ShowTavern();
         // The served bowl is the Main's whole-dish art (KRAKEN/RAT/FOX/HAM/ELK FINAL STEW).
-        if (dishImage && submittedPicks.TryGetValue(SlotType.Main, out var mainPick) && mainPick && mainPick.dishSprite)
+        submittedPicks.TryGetValue(SlotType.Main, out var mainPick);
+        bool haveDish = dishImage && mainPick && mainPick.dishSprite;
+        if (haveDish)
         {
             dishImage.sprite = mainPick.dishSprite;
             dishImage.color  = Color.white;
         }
+        if (dishImage) dishImage.enabled = haveDish;   // never leave a blank/stale bowl on the counter
         dishOnCounter.SetActive(true);            // dish + mead mug together
     }
 
@@ -134,13 +136,6 @@ public class GameManager : MonoBehaviour
             EndNight();
     }
 
-    private void HandlePatienceEmpty()
-    {
-        if (state != GameState.Ordering && state != GameState.Cooking
-            && state != GameState.Delivering) return;
-        StartCoroutine(AngryLeaveRoutine());
-    }
-
     // ---------- the beats (all timing in coroutines + TavernFeelSO) ----------
     private void NextCustomer() => StartCoroutine(NextCustomerRoutine());
 
@@ -154,16 +149,13 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(config.delayBetweenCustomers);
         currentOrder = generator.Draw();
         yield return customerView.EnterRoutine(currentOrder, generator.CurrentCharacter);
-        patience.StartDraining();
-        SetState(GameState.Ordering);
+        SetState(GameState.Ordering);   // no per-customer timer — the night clock is the only pressure
     }
 
     private IEnumerator ReactionRoutine()
     {
         SetState(GameState.Reacting);
-        patience.StopDraining();
-        var result = ScoringService.Score(currentOrder, submittedPicks,
-                                          patience.Fraction, IsLastCall, config);
+        var result = ScoringService.Score(currentOrder, submittedPicks, IsLastCall, config);
         totalHearts += result.hearts;
         totalCoins  += result.coins;
         customersServed++;
@@ -178,22 +170,10 @@ public class GameManager : MonoBehaviour
         }
         dishOnCounter.SetActive(false);
         customerView.ShowReaction(result.hearts);
-        reactionFX.Play(result.hearts, result.coins);
-        yield return new WaitForSeconds(tavernFeel.reactionTotalSeconds);
+        Coroutine reactionBeat = reactionFX.Play(result.hearts, result.coins);
+        yield return new WaitForSeconds(tavernFeel.reactionTotalSeconds); // minimum beat (also covers the 0-heart case, which has no FX)
+        yield return reactionBeat;                                        // then guarantee hearts + coin popup fully finished
         yield return customerView.ExitRoutine(result.hearts > 0);
-        if (nightOver) EndNight(); else NextCustomer();
-    }
-
-    private IEnumerator AngryLeaveRoutine()
-    {
-        bool wasCooking = state == GameState.Cooking;
-        SetState(GameState.Reacting);
-        patience.StopDraining();
-        if (wasCooking) { screens.ShowTavern(); stewBuilder.Clear(); }
-        dishOnCounter.SetActive(false);
-        customerView.ShowReaction(0);               // annoyed face, zero hearts
-        yield return new WaitForSeconds(tavernFeel.reactionTotalSeconds);
-        yield return customerView.ExitRoutine(false);
         if (nightOver) EndNight(); else NextCustomer();
     }
 
@@ -214,7 +194,6 @@ public class GameManager : MonoBehaviour
     private void EndNight()
     {
         SetState(GameState.NightEnd);
-        patience.StopDraining();
         int rankIndex = ScoringService.RankIndex(totalHearts, config);
         endScreen.Show(customersServed, totalHearts, totalCoins,
                        rankIndex, story.endingLinesByRank[rankIndex]);

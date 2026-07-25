@@ -32,6 +32,11 @@ public class TavernStewStudio : EditorWindow
     float bulkJarPct = 100f;
     float bulkJarFont = 24f;
 
+    // Top-level tabs — one page at a time so you never wade through one giant scroll.
+    static readonly string[] Tabs = { "Level", "Reactions & Dish", "Night & Pace", "Kitchen", "Text" };
+    int tab;
+    float candlePreview = 1f;
+
     // ---------- asset lookups ----------
     static List<T> LoadAll<T>(string folder) where T : Object =>
         AssetDatabase.FindAssets("t:" + typeof(T).Name, new[] { folder })
@@ -149,12 +154,25 @@ public class TavernStewStudio : EditorWindow
     void OnGUI()
     {
         DrawToolbar();   // sticky top — not inside the scroll view
+        DrawTabs();      // page selector — also sticky, keeps each area short
 
         scroll = EditorGUILayout.BeginScrollView(scroll);
-        DrawCharacterLevel();
-        DrawIngredients();
-        DrawTextTools();
+        switch (tab)
+        {
+            case 0: DrawCharacterLevel(); break;
+            case 1: DrawReactionsDish();  break;
+            case 2: DrawNightPace();      break;
+            case 3: DrawIngredients();    break;
+            case 4: DrawTextTools();      break;
+        }
         EditorGUILayout.EndScrollView();
+    }
+
+    void DrawTabs()
+    {
+        EditorGUI.BeginChangeCheck();
+        int t = GUILayout.Toolbar(tab, Tabs, GUILayout.Height(24));
+        if (EditorGUI.EndChangeCheck()) { tab = t; scroll = Vector2.zero; GUI.FocusControl(null); }
     }
 
     // Tavern ⇄ Kitchen switch + Apply-all, always visible at the top.
@@ -183,6 +201,247 @@ public class TavernStewStudio : EditorWindow
                 if (cs.Count > 0) PreviewVisitor(cs[Mathf.Clamp(visitorIndex, 0, cs.Count - 1)]);
             }
         }
+    }
+
+    // ---------- shared lookups for the tavern-feel tabs ----------
+    static T FindSO<T>() where T : ScriptableObject =>
+        AssetDatabase.FindAssets("t:" + typeof(T).Name)
+            .Select(g => AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(g)))
+            .FirstOrDefault();
+
+    static ReactionFX   ReactionInScene() => Scene<ReactionFX>().FirstOrDefault();
+    static CustomerView CustView()        => Scene<CustomerView>().FirstOrDefault();
+    static NightClock   Clock()           => Scene<NightClock>().FirstOrDefault();
+
+    static GameObject DishOnCounterGO()
+    {
+        var gm = Scene<GameManager>().FirstOrDefault();
+        return gm ? new SerializedObject(gm).FindProperty("dishOnCounter").objectReferenceValue as GameObject : null;
+    }
+    static Image CandleFill()
+    {
+        var c = Clock();
+        return c ? new SerializedObject(c).FindProperty("candleFill").objectReferenceValue as Image : null;
+    }
+    static TMP_Text ClockLabel()
+    {
+        var c = Clock();
+        return c ? new SerializedObject(c).FindProperty("timeLabel").objectReferenceValue as TMP_Text : null;
+    }
+
+    // Undo-able slider bound straight to an SO float — the whole point of the feel tabs.
+    static void SOSlider(ScriptableObject so, string label, float val, float min, float max, System.Action<float> set)
+    {
+        EditorGUI.BeginChangeCheck();
+        float v = EditorGUILayout.Slider(label, val, min, max);
+        if (EditorGUI.EndChangeCheck()) { Undo.RecordObject(so, "Tune " + label); set(v); EditorUtility.SetDirty(so); }
+    }
+    static void SOToggle(ScriptableObject so, string label, bool val, System.Action<bool> set)
+    {
+        EditorGUI.BeginChangeCheck();
+        bool v = EditorGUILayout.ToggleLeft(label, val);
+        if (EditorGUI.EndChangeCheck()) { Undo.RecordObject(so, "Toggle " + label); set(v); EditorUtility.SetDirty(so); }
+    }
+
+    // ---------- Tab: Reactions & Dish (tavern) ----------
+    // See the customer's happy/sad beat and the served bowl WITHOUT Play mode, and tune the feel live.
+    void DrawReactionsDish()
+    {
+        Header("Reaction beat — preview the customer's happy/sad moment (tavern)");
+        var feel = FindSO<TavernFeelSO>();
+        int cph = FindSO<GameConfigSO>()?.coinsPerHeart ?? 5;
+
+        EditorGUILayout.LabelField("Preview on the tavern customer (edit mode — a static pose):", EditorStyles.miniLabel);
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            if (GUILayout.Button("😞 0♥"))  PreviewReaction(0, cph);
+            if (GUILayout.Button("😐 1♥"))  PreviewReaction(1, cph);
+            if (GUILayout.Button("🙂 2♥"))  PreviewReaction(2, cph);
+            if (GUILayout.Button("😍 3♥"))  PreviewReaction(3, cph);
+            GUILayout.Space(8);
+            if (GUILayout.Button("Clear", GUILayout.Width(70))) ClearReactionPreview();
+        }
+        EditorGUILayout.HelpBox("Shows N hearts + the coin popup over the customer. Enter Play for the full animated beat.", MessageType.None);
+
+        Header("Served dish on the counter");
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            if (GUILayout.Button("Show served dish (current visitor's Main)", GUILayout.Height(24))) SetDishOnCounter(true);
+            if (GUILayout.Button("Hide", GUILayout.Width(70), GUILayout.Height(24)))               SetDishOnCounter(false);
+        }
+        showDishSize = EditorGUILayout.Foldout(showDishSize, "Dish size & proportions", true);
+        if (showDishSize)
+        {
+            var chars = Characters();
+            var c = chars.Count > 0 ? chars[Mathf.Clamp(visitorIndex, 0, chars.Count - 1)] : null;
+            FitScale(new[] { DishImage() }, c && c.main ? c.main.dishSprite : null);
+        }
+
+        Header("Feel — tune the reaction (writes to TavernFeelSO)");
+        if (feel == null) { EditorGUILayout.HelpBox("No TavernFeelSO found in the project.", MessageType.Warning); return; }
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            EditorGUI.BeginChangeCheck();
+            int minH = EditorGUILayout.IntSlider("Hearts for happy face+hop", feel.happyFaceMinHearts, 1, 3);
+            if (EditorGUI.EndChangeCheck()) { Undo.RecordObject(feel, "Tune"); feel.happyFaceMinHearts = minH; EditorUtility.SetDirty(feel); }
+
+            SOSlider(feel, "Happy hop height (px)", feel.happyHopHeight,   0f, 100f, v => feel.happyHopHeight = v);
+            SOSlider(feel, "Happy hop time (s)",    feel.happyHopSeconds,  0.05f, 1f, v => feel.happyHopSeconds = v);
+            SOSlider(feel, "Sad droop (px)",        feel.sadDroopPixels,   0f, 60f,  v => feel.sadDroopPixels = v);
+            EditorGUILayout.Space(4);
+            SOSlider(feel, "Reaction length (s)",   feel.reactionTotalSeconds, 0.3f, 3f, v => feel.reactionTotalSeconds = v);
+            SOSlider(feel, "Heart pop interval (s)",feel.heartPopInterval, 0.02f, 0.6f, v => feel.heartPopInterval = v);
+            SOSlider(feel, "Heart pop scale",       feel.heartPopScale,    1f, 1.6f, v => feel.heartPopScale = v);
+            SOSlider(feel, "Coin fly time (s)",     feel.coinFlySeconds,   0.1f, 2f,  v => feel.coinFlySeconds = v);
+            SOSlider(feel, "Coin rise (px)",        feel.coinRisePixels,   0f, 200f, v => feel.coinRisePixels = v);
+            SOSlider(feel, "Fade in (s)",           feel.fadeInSeconds,    0.05f, 2f, v => feel.fadeInSeconds = v);
+            SOSlider(feel, "Fade out (s)",          feel.fadeOutSeconds,   0.05f, 2f, v => feel.fadeOutSeconds = v);
+        }
+    }
+
+    void PreviewReaction(int hearts, int coinsPerHeart)
+    {
+        ShowView(true);
+        var cv = CustView();
+        if (cv)
+        {
+            var so = new SerializedObject(cv);
+            if (so.FindProperty("group").objectReferenceValue is CanvasGroup grp)
+            { Undo.RecordObject(grp, "Preview reaction"); grp.alpha = 1f; grp.interactable = true; grp.blocksRaycasts = true; EditorUtility.SetDirty(grp); }
+            if (so.FindProperty("thoughtBubble").objectReferenceValue is GameObject tb)
+            { Undo.RecordObject(tb, "Preview reaction"); tb.SetActive(false); EditorUtility.SetDirty(tb); }
+        }
+        var rf = ReactionInScene();
+        if (rf)
+        {
+            var so = new SerializedObject(rf);
+            var arr = so.FindProperty("hearts");
+            for (int i = 0; i < arr.arraySize; i++)
+                if (arr.GetArrayElementAtIndex(i).objectReferenceValue is GameObject h)
+                { Undo.RecordObject(h, "Preview reaction"); h.SetActive(i < hearts); EditorUtility.SetDirty(h); }
+            if (so.FindProperty("coinPopupLabel").objectReferenceValue is TMP_Text lbl)
+            {
+                Undo.RecordObject(lbl, "Preview reaction"); Undo.RecordObject(lbl.gameObject, "Preview reaction");
+                lbl.text = "+" + (hearts * coinsPerHeart);
+                lbl.gameObject.SetActive(hearts > 0);
+                EditorUtility.SetDirty(lbl);
+            }
+        }
+        Dirty();
+    }
+
+    void ClearReactionPreview()
+    {
+        var rf = ReactionInScene();
+        if (rf)
+        {
+            var so = new SerializedObject(rf);
+            var arr = so.FindProperty("hearts");
+            for (int i = 0; i < arr.arraySize; i++)
+                if (arr.GetArrayElementAtIndex(i).objectReferenceValue is GameObject h)
+                { Undo.RecordObject(h, "Clear preview"); h.SetActive(false); EditorUtility.SetDirty(h); }
+            if (so.FindProperty("coinPopupLabel").objectReferenceValue is TMP_Text lbl)
+            { Undo.RecordObject(lbl.gameObject, "Clear preview"); lbl.gameObject.SetActive(false); EditorUtility.SetDirty(lbl); }
+        }
+        Dirty();
+    }
+
+    void SetDishOnCounter(bool on)
+    {
+        ShowView(true);
+        var go = DishOnCounterGO();
+        if (go) { Undo.RecordObject(go, "Toggle dish"); go.SetActive(on); EditorUtility.SetDirty(go); }
+        if (on)
+        {
+            var chars = Characters();
+            var c = chars.Count > 0 ? chars[Mathf.Clamp(visitorIndex, 0, chars.Count - 1)] : null;
+            var dish = DishImage();
+            if (dish && c && c.main && c.main.dishSprite) SetImage(dish, c.main.dishSprite, true);
+        }
+        Dirty();
+    }
+
+    // ---------- Tab: Night & Pace ----------
+    // The desk candle (night timer) + the tempo knobs. Candle preview is edit-mode only; the
+    // GameConfig/DebugConfig knobs also drive Play Mode live (they write to the SO).
+    void DrawNightPace()
+    {
+        Header("Candle — the desk night timer");
+        var cfg = FindSO<GameConfigSO>();
+        var dbg = FindSO<DebugConfigSO>();
+        var candle = CandleFill();
+
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            if (candle == null)
+                EditorGUILayout.HelpBox("No candle Image wired on NightClock (candleFill).", MessageType.None);
+            else
+            {
+                EditorGUI.BeginChangeCheck();
+                candlePreview = EditorGUILayout.Slider("Preview fill (night left)", candlePreview, 0f, 1f);
+                if (EditorGUI.EndChangeCheck()) SetCandle(candlePreview);
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("🕯 Full (night start)")) { candlePreview = 1f; SetCandle(1f); }
+                    if (GUILayout.Button("Half"))                   { candlePreview = 0.5f; SetCandle(0.5f); }
+                    float lc = (cfg && cfg.nightSeconds > 0) ? cfg.lastCallSeconds / cfg.nightSeconds : 0.15f;
+                    if (GUILayout.Button("Last call"))              { candlePreview = lc; SetCandle(lc); }
+                    if (GUILayout.Button("Out (night end)"))        { candlePreview = 0f; SetCandle(0f); }
+                }
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Show candle")) EnableGO(candle.gameObject, true);
+                    if (GUILayout.Button("Hide candle")) EnableGO(candle.gameObject, false);
+                }
+            }
+        }
+
+        Header("Start / freeze the night (Play Mode behaviour)");
+        if (dbg == null) EditorGUILayout.HelpBox("No DebugConfigSO found.", MessageType.None);
+        else
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                SOToggle(dbg, "❄ Freeze the night — clock & patience stand still (design mode)", dbg.freezeTimers, v => dbg.freezeTimers = v);
+                SOToggle(dbg, "⏩ Skip intro — the night starts the moment you press Play", dbg.skipIntro, v => dbg.skipIntro = v);
+                SOSlider(dbg, "Night speed ×  (4 ≈ whole night in ~45s)", dbg.nightSpeedMultiplier, 1f, 10f, v => dbg.nightSpeedMultiplier = v);
+            }
+
+        Header("Pace & time (GameConfigSO)");
+        if (cfg == null) { EditorGUILayout.HelpBox("No GameConfigSO found.", MessageType.Warning); return; }
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            SOSlider(cfg, "Night length (s)",           cfg.nightSeconds,          60f, 600f, v => cfg.nightSeconds = v);
+            SOSlider(cfg, "Last call at (s left)",       cfg.lastCallSeconds,       10f, 60f,  v => cfg.lastCallSeconds = v);
+            SOSlider(cfg, "Patience per customer (s)",   cfg.patienceSeconds,       5f, 60f,   v => cfg.patienceSeconds = v);
+            SOSlider(cfg, "Delay between customers (s)", cfg.delayBetweenCustomers, 0f, 3f,    v => cfg.delayBetweenCustomers = v);
+            int m = Mathf.FloorToInt(cfg.nightSeconds / 60f), s = Mathf.FloorToInt(cfg.nightSeconds % 60f);
+            EditorGUILayout.LabelField($"→ a full night runs {m}:{s:00}", EditorStyles.miniLabel);
+        }
+    }
+
+    void SetCandle(float frac)
+    {
+        var img = CandleFill();
+        if (img) { Undo.RecordObject(img, "Preview candle"); img.type = Image.Type.Filled; img.fillAmount = frac; EditorUtility.SetDirty(img); }
+        var lbl = ClockLabel();
+        var cfg = FindSO<GameConfigSO>();
+        if (lbl && cfg)
+        {
+            float secs = cfg.nightSeconds * frac;
+            int m = Mathf.FloorToInt(secs / 60f), s = Mathf.FloorToInt(secs % 60f);
+            Undo.RecordObject(lbl, "Preview candle"); lbl.text = m + ":" + s.ToString("00"); EditorUtility.SetDirty(lbl);
+        }
+        Dirty();
+    }
+
+    static void EnableGO(GameObject go, bool on)
+    {
+        if (!go) return;
+        Undo.RecordObject(go, "Toggle");
+        go.SetActive(on);
+        EditorUtility.SetDirty(go);
+        Dirty();
     }
 
     // ---------- Character = Level ----------

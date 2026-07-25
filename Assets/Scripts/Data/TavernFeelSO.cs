@@ -19,6 +19,9 @@ public class TavernFeelSO : ScriptableObject
     [Range(1f, 1.6f)]    public float heartPopScale = 1.3f;
     [Range(0.1f, 2f)]    public float coinFlySeconds = 0.5f;
     [Range(0f, 200f)]    public float coinRisePixels = 60f;
+    [Tooltip("All 3 heart slots always show; earned = full colour, the rest sit dimmed as empty slots")]
+    public Color heartFullColor  = new Color(0.90f, 0.25f, 0.35f, 1f);
+    public Color heartEmptyColor = new Color(0.35f, 0.35f, 0.40f, 0.5f);
 
     [Header("Patience bar — read by PatienceMeter")]
     [Tooltip("Fraction below which the bar turns urgent")]

@@ -9,7 +9,7 @@ public static class ScoringService
     public static Result Score(
         Dictionary<SlotType, IngredientSO> order,
         Dictionary<SlotType, IngredientSO> picks,
-        float patienceFraction, bool isLastCall, GameConfigSO config)
+        bool isLastCall, GameConfigSO config)
     {
         int hearts = 0;
         foreach (var kv in order)
@@ -17,7 +17,6 @@ public static class ScoringService
                 hearts++;
 
         int coins = hearts * config.coinsPerHeart;
-        if (patienceFraction > config.patienceBonusThreshold) coins += config.patienceBonusCoins;
         if (isLastCall) coins *= config.lastCallMultiplier;
 
         return new Result { hearts = hearts, coins = coins };
