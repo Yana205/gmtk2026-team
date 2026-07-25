@@ -52,14 +52,24 @@ public static class Tween
         r.anchoredPosition = home;
     }
 
-    // Scale punch and settle back
+    // Scale punch: fast attack to the peak, then a damped overshoot settle back (snappier than a linear triangle).
     public static IEnumerator Punch(Transform tr, float scale, float seconds)
     {
         Vector3 baseScale = tr.localScale;
-        Vector3 peak = baseScale * scale;
-        float half = Mathf.Max(0.01f, seconds * 0.5f);
-        for (float t = 0f; t < half; t += Time.deltaTime) { tr.localScale = Vector3.Lerp(baseScale, peak, t / half); yield return null; }
-        for (float t = 0f; t < half; t += Time.deltaTime) { tr.localScale = Vector3.Lerp(peak, baseScale, t / half); yield return null; }
+        float amp = scale - 1f;
+        for (float t = 0f; t < seconds; t += Time.deltaTime)
+        {
+            tr.localScale = baseScale * (1f + amp * Punch01(t / seconds));
+            yield return null;
+        }
         tr.localScale = baseScale;
+    }
+
+    // 0 -> peak(1) in the first 30%, then a decaying overshoot (dips slightly past base) back to 0.
+    private static float Punch01(float p)
+    {
+        if (p < 0.3f) return Mathf.SmoothStep(0f, 1f, p / 0.3f);
+        float q = (p - 0.3f) / 0.7f;
+        return Mathf.Cos(q * Mathf.PI * 1.5f) * (1f - q);
     }
 }

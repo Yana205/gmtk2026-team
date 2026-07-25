@@ -48,6 +48,8 @@ public class StoryDataSO : ScriptableObject
     {
         [Tooltip("Direct SO reference — no string lookups to break")]
         public IngredientSO ingredientToUnlock;
+        [Tooltip("Poster art for the tavern 'Catch of the Day' sign (CATCH OF THE DAY RAT/FOX/KRAKEN)")]
+        public Sprite signArt;
         [TextArea(1, 2)] public string toastLine;
 
         [Header("Napkin (leave hasNapkin off for Pixie Dust — do not invent text)")]

@@ -13,6 +13,20 @@ public class TavernFeelSO : ScriptableObject
     [Tooltip("Hearts needed for the happy face + hop. Below this (but >0) = neutral, 0 = sad")]
     [Range(1, 3)]      public int happyFaceMinHearts = 3;
 
+    [Header("Entrance/exit motion v2 — read by CustomerView")]
+    [Tooltip("How far below home the bust starts before sliding up on entrance")]
+    [Range(0f, 250f)]  public float enterRisePixels = 70f;
+    [Tooltip("How far the bust drifts as it leaves (up when happy, down when sad) while fading out")]
+    [Range(0f, 250f)]  public float exitDriftPixels = 60f;
+    [Tooltip("Seconds to ease into the sad droop (0-heart reaction)")]
+    [Range(0.05f, 1f)] public float sadDroopSeconds = 0.35f;
+
+    [Header("Idle life while ordering — read by CustomerView")]
+    [Tooltip("Vertical bob amplitude of the waiting bust (0 = off)")]
+    [Range(0f, 30f)]   public float idleBobPixels = 5f;
+    [Tooltip("Seconds for one full bob cycle")]
+    [Range(0.5f, 4f)]  public float idleBobSeconds = 2.2f;
+
     [Header("Reaction beat — read by GameManager's coroutine + ReactionFX")]
     [Range(0.3f, 3f)]    public float reactionTotalSeconds = 1.2f;
     [Range(0.02f, 0.6f)] public float heartPopInterval = 0.15f;

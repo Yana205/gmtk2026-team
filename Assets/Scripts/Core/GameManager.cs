@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private ReactionFX reactionFX;
     [SerializeField] private ToastBanner toast;
     [SerializeField] private NapkinPile napkins;
+    [SerializeField] private CatchOfTheDaySign catchSign;   // wooden wall sign, updates on each drop-off
     [SerializeField] private EndScreen endScreen;
     [SerializeField] private GameObject introPanel;
 
@@ -56,7 +57,6 @@ public class GameManager : MonoBehaviour
 
     private Dictionary<SlotType, IngredientSO> currentOrder;    // the secret craving
     private Dictionary<SlotType, IngredientSO> submittedPicks;  // what you cooked
-    private readonly List<int> pendingUnlocks = new List<int>();
     private bool nightOver;
 
     // ---------- lifecycle ----------
@@ -64,7 +64,6 @@ public class GameManager : MonoBehaviour
     {
         nightClock.OnLastCall    += HandleLastCall;
         nightClock.OnNightEnd    += HandleNightEnd;
-        nightClock.OnUnlock      += HandleUnlock;
     }
 
     private void Start()
@@ -126,8 +125,6 @@ public class GameManager : MonoBehaviour
         StartCoroutine(toast.ShowRoutine(story.lastCallBanner));
     }
 
-    private void HandleUnlock(int index) => pendingUnlocks.Add(index);
-
     private void HandleNightEnd()
     {
         nightOver = true;
@@ -142,7 +139,6 @@ public class GameManager : MonoBehaviour
     private IEnumerator NextCustomerRoutine()
     {
         SetState(GameState.CustomerEntering);
-        yield return ConsumeUnlockBeats();          // unlocks fire ONLY between customers
         if (nightOver) { EndNight(); yield break; }
         // Fixed-visitor night ends when the scripted guest list runs out (Letitia → Caledon → Milog).
         if (generator.FixedMode && !generator.HasNext) { EndNight(); yield break; }
@@ -174,21 +170,22 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(tavernFeel.reactionTotalSeconds); // minimum beat (also covers the 0-heart case, which has no FX)
         yield return reactionBeat;                                        // then guarantee hearts + coin popup fully finished
         yield return customerView.ExitRoutine(result.hearts > 0);
+        yield return FireUnlockBeat(customersServed - 1);                 // the visitor drops off today's catch as they leave
         if (nightOver) EndNight(); else NextCustomer();
     }
 
-    private IEnumerator ConsumeUnlockBeats()
+    // The served visitor leaves their kill behind: reveal that catch of the day (shelf silhouette -> live jar),
+    // update the wooden wall sign, and announce it. Beat index is aligned with serve order (0,1,2).
+    private IEnumerator FireUnlockBeat(int i)
     {
-        foreach (int i in pendingUnlocks)
-        {
-            if (i >= story.unlockBeats.Length) continue;   // index-alignment safety clamp
-            var beat = story.unlockBeats[i];
-            generator.Unlock(beat.ingredientToUnlock);     // enters the customer pool
-            stewBuilder.UnlockJar(beat.ingredientToUnlock);// jar appears on the shelf
-            if (beat.hasNapkin) napkins.Add(beat);         // napkin lands on the desk
-            yield return toast.ShowRoutine(beat.toastLine);
-        }
-        pendingUnlocks.Clear();
+        if (story.unlockBeats == null || i < 0 || i >= story.unlockBeats.Length) yield break;
+        var beat = story.unlockBeats[i];
+        if (beat.ingredientToUnlock == null) yield break;
+        generator.Unlock(beat.ingredientToUnlock);      // enters the customer pool
+        stewBuilder.UnlockJar(beat.ingredientToUnlock); // silhouette becomes a live, clickable jar
+        if (catchSign && beat.signArt) catchSign.Show(beat.signArt);   // wall sign shows today's catch
+        if (beat.hasNapkin) napkins.Add(beat);          // (off for the fixed visitors — their napkin comes from CharacterSO)
+        yield return toast.ShowRoutine(beat.toastLine);
     }
 
     private void EndNight()

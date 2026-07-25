@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSO
   displayName: Letitia
   portrait: {fileID: 21300000, guid: 11076702b3a444956b93653177b4e41a, type: 3}
-  main: {fileID: 11400000, guid: 496daac1643464433b5ffbc7b09da4d8, type: 2}
+  main: {fileID: 11400000, guid: 836984558612740968e558ca67aa0150, type: 2}
   side: {fileID: 11400000, guid: 3e98d78c09a2d499ba0896874eb9c0ed, type: 2}
   sauce: {fileID: 11400000, guid: 752edbfa5f8ee427db37dfdfba587e4c, type: 2}
   napkinText: Gods, do I love seafood! Takes me back to when ma' and I went catching

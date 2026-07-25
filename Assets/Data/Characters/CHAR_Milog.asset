@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSO
   displayName: Milog
   portrait: {fileID: 21300000, guid: 9c595cf8c146d47ae84591f7993e2ea2, type: 3}
-  main: {fileID: 11400000, guid: c2bcf3b319eb6401cb1bfc12fa6fca31, type: 2}
+  main: {fileID: 11400000, guid: 1dff0a89e28914ead940306d94c4a6fb, type: 2}
   side: {fileID: 11400000, guid: 45af2a90cb65a4acb95c17467ad5a000, type: 2}
   sauce: {fileID: 11400000, guid: b0de079e6072346e78eaaf256364d6d8, type: 2}
   napkinText: My thanks. Having completed my lifelong quest to free my people from

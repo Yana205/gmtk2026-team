@@ -18,5 +18,5 @@ MonoBehaviour:
   stewSprite: {fileID: 0}
   wornSprite: {fileID: 0}
   dishSprite: {fileID: -3884275782305752274, guid: 53d8015915bb240aba99a0846604c9e9, type: 3}
-  startsLocked: 0
+  startsLocked: 1
   placeholderColor: {r: 0.2, g: 0.7, b: 0.7, a: 1}

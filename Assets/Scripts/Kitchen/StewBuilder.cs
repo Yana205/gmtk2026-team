@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,8 +20,6 @@ public class StewBuilder : MonoBehaviour
     [SerializeField] private Image sideLayer;
     [SerializeField] private Image sauceLayer;
     [SerializeField] private RectTransform potRect;
-    [Tooltip("Text list of what's been added — replaces the greybox colored rectangles")]
-    [SerializeField] private TMP_Text potContents;
 
     [Header("Shelf — all 10 jars")]
     [SerializeField] private List<IngredientJar> jars;
@@ -46,9 +42,15 @@ public class StewBuilder : MonoBehaviour
     {
         potHome = potRect.anchoredPosition;
         serveButton.onClick.AddListener(() => gameManager.SubmitDish(picks));
-        foreach (var jar in jars)
-            jar.gameObject.SetActive(!jar.Ingredient.startsLocked || (debug && debug.AllJarsOn));
         Clear();
+    }
+
+    // Locking waits until Start so every IngredientJar.Awake (which paints the unlocked look) has run.
+    // Catch-of-the-day jars stay on the shelf as black silhouettes until their visitor drops them off.
+    private void Start()
+    {
+        foreach (var jar in jars)
+            jar.SetLocked(jar.Ingredient.startsLocked && !(debug && debug.AllJarsOn));
     }
 
     public void BeginCooking(Dictionary<SlotType, IngredientSO> order, CharacterSO character)
@@ -62,7 +64,7 @@ public class StewBuilder : MonoBehaviour
     public void UnlockJar(IngredientSO ing)
     {
         foreach (var jar in jars)
-            if (jar.Ingredient == ing) jar.gameObject.SetActive(true);
+            if (jar.Ingredient == ing) jar.SetLocked(false);
     }
 
     public void Select(IngredientSO ing, RectTransform fromJar)
@@ -94,23 +96,6 @@ public class StewBuilder : MonoBehaviour
         SetLayer(mainLayer,  SlotType.Main);
         SetLayer(sideLayer,  SlotType.Side);
         SetLayer(sauceLayer, SlotType.Sauce);
-        RedrawContents();
-    }
-
-    // Simple text of what's in the pot — the greybox rectangles are gone.
-    private void RedrawContents()
-    {
-        if (!potContents) return;
-        var sb = new StringBuilder();
-        AppendPick(sb, SlotType.Main);
-        AppendPick(sb, SlotType.Side);
-        AppendPick(sb, SlotType.Sauce);
-        potContents.text = sb.Length == 0 ? "<i>empty pot</i>" : sb.ToString().TrimEnd();
-    }
-
-    private void AppendPick(StringBuilder sb, SlotType slot)
-    {
-        if (picks.TryGetValue(slot, out var ing) && ing) sb.AppendLine("+ " + ing.displayName);
     }
 
     // Only ever show a pot overlay when there is REAL stew art — never a placeholder rectangle.

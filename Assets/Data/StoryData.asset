@@ -23,26 +23,23 @@ MonoBehaviour:
   - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank S)"
   lastCallBanner: LAST CALL! Coins x2
   unlockBeats:
+  - ingredientToUnlock: {fileID: 11400000, guid: 97deed0de91e84432b982592c00c84e1, type: 2}
+    signArt: {fileID: 21300000, guid: df7aded929afd4ea99f3596e0e07bf70, type: 3}
+    toastLine: 'Letitia dropped off today''s kill: RAT KING!'
+    hasNapkin: 0
+    guestName: 
+    napkinText: 
+    idealStew: []
+  - ingredientToUnlock: {fileID: 11400000, guid: 1dff0a89e28914ead940306d94c4a6fb, type: 2}
+    signArt: {fileID: 21300000, guid: 439001970f3e4433f982bea08b9ab633, type: 3}
+    toastLine: 'Caledon dropped off today''s kill: NINE-TAILED FOX!'
+    hasNapkin: 0
+    guestName: 
+    napkinText: 
+    idealStew: []
   - ingredientToUnlock: {fileID: 11400000, guid: 496daac1643464433b5ffbc7b09da4d8, type: 2}
-    toastLine: 'Letitia dropped off today''s kill: KRAKEN!'
-    hasNapkin: 1
-    guestName: Letitia
-    napkinText: "[WRITER TEXT \u2014 paste verbatim] (Letitia's seafood note)"
-    idealStew:
-    - {fileID: 11400000, guid: 496daac1643464433b5ffbc7b09da4d8, type: 2}
-    - {fileID: 11400000, guid: 3e98d78c09a2d499ba0896874eb9c0ed, type: 2}
-    - {fileID: 11400000, guid: 752edbfa5f8ee427db37dfdfba587e4c, type: 2}
-  - ingredientToUnlock: {fileID: 11400000, guid: ad1ccbfc57a2e433e8937814aee3063e, type: 2}
-    toastLine: 'Milog dropped off today''s kill: DRAGON!'
-    hasNapkin: 1
-    guestName: Milog
-    napkinText: "[WRITER TEXT \u2014 paste verbatim] (Milog's quest note)"
-    idealStew:
-    - {fileID: 11400000, guid: c2bcf3b319eb6401cb1bfc12fa6fca31, type: 2}
-    - {fileID: 11400000, guid: 45af2a90cb65a4acb95c17467ad5a000, type: 2}
-    - {fileID: 11400000, guid: b0de079e6072346e78eaaf256364d6d8, type: 2}
-  - ingredientToUnlock: {fileID: 11400000, guid: b40318efda5f1459aab568a26f9ccd84, type: 2}
-    toastLine: 'New on the shelf: PIXIE DUST'
+    signArt: {fileID: 21300000, guid: 94e20d72ccb804f668ba6b1248e1818b, type: 3}
+    toastLine: 'Milog dropped off today''s kill: KRAKEN!'
     hasNapkin: 0
     guestName: 
     napkinText: 
