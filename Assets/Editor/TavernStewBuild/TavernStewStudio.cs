@@ -33,7 +33,7 @@ public class TavernStewStudio : EditorWindow
     float bulkJarFont = 24f;
 
     // Top-level tabs — one page at a time so you never wade through one giant scroll.
-    static readonly string[] Tabs = { "Level", "Reactions & Dish", "Night & Pace", "Kitchen", "Text" };
+    static readonly string[] Tabs = { "Level", "Reactions & Dish", "Effects", "Night & Pace", "Kitchen", "Text" };
     int tab;
     float candlePreview = 1f;
 
@@ -161,9 +161,10 @@ public class TavernStewStudio : EditorWindow
         {
             case 0: DrawCharacterLevel(); break;
             case 1: DrawReactionsDish();  break;
-            case 2: DrawNightPace();      break;
-            case 3: DrawIngredients();    break;
-            case 4: DrawTextTools();      break;
+            case 2: DrawEffects();        break;
+            case 3: DrawNightPace();      break;
+            case 4: DrawIngredients();    break;
+            case 5: DrawTextTools();      break;
         }
         EditorGUILayout.EndScrollView();
     }
@@ -359,6 +360,89 @@ public class TavernStewStudio : EditorWindow
             if (dish && c && c.main && c.main.dishSprite) SetImage(dish, c.main.dishSprite, true);
         }
         Dirty();
+    }
+
+    // ---------- Tab: Effects ----------
+    // Every animation/juice knob in one place: the customer bust's entrance/idle/exit, the kitchen
+    // jar+pot juice, and how dark a locked catch-of-the-day silhouette reads. All write to the Feel
+    // SOs (or the jars) and update the running tweens LIVE while you're in Play mode.
+    void DrawEffects()
+    {
+        Header("Effects — motion & juice (drag in Play mode to feel it live)");
+        var tf = FindSO<TavernFeelSO>();
+        var kf = KitchenFeel();
+        EditorGUILayout.HelpBox("These drive runtime animation. Press Play, then drag — the sliders retune the tweens without leaving Play.", MessageType.Info);
+
+        EditorGUILayout.LabelField("Customer bust — entrance · idle · exit  (TavernFeelSO)", EditorStyles.miniBoldLabel);
+        if (tf == null) EditorGUILayout.HelpBox("No TavernFeelSO found in the project.", MessageType.Warning);
+        else using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            SOSlider(tf, "Fade in (s)",           tf.fadeInSeconds,    0.05f, 2f,  v => tf.fadeInSeconds = v);
+            SOSlider(tf, "Enter rise (px)",       tf.enterRisePixels,  0f, 250f,   v => tf.enterRisePixels = v);
+            EditorGUILayout.Space(3);
+            SOSlider(tf, "Idle bob (px)",         tf.idleBobPixels,    0f, 30f,    v => tf.idleBobPixels = v);
+            SOSlider(tf, "Idle bob cycle (s)",    tf.idleBobSeconds,   0.5f, 4f,   v => tf.idleBobSeconds = v);
+            EditorGUILayout.Space(3);
+            SOSlider(tf, "Fade out (s)",          tf.fadeOutSeconds,   0.05f, 2f,  v => tf.fadeOutSeconds = v);
+            SOSlider(tf, "Exit drift (px)",       tf.exitDriftPixels,  0f, 250f,   v => tf.exitDriftPixels = v);
+            EditorGUILayout.LabelField("Happy drifts up, unhappy slumps down as they fade.", EditorStyles.miniLabel);
+            EditorGUILayout.Space(3);
+            SOSlider(tf, "Happy hop height (px)", tf.happyHopHeight,   0f, 100f,   v => tf.happyHopHeight = v);
+            SOSlider(tf, "Happy hop time (s)",    tf.happyHopSeconds,  0.05f, 1f,  v => tf.happyHopSeconds = v);
+            SOSlider(tf, "Sad droop (px)",        tf.sadDroopPixels,   0f, 60f,    v => tf.sadDroopPixels = v);
+            SOSlider(tf, "Sad droop time (s)",    tf.sadDroopSeconds,  0.05f, 1f,  v => tf.sadDroopSeconds = v);
+        }
+
+        Header("Kitchen juice — jar click/hover, arc into the pot, pot bounce  (KitchenFeelSO)");
+        if (kf == null) EditorGUILayout.HelpBox("No KitchenFeelSO found in the project.", MessageType.Warning);
+        else using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            SOSlider(kf, "Jar hover scale",    kf.jarHoverScale,    1f, 1.5f,   v => kf.jarHoverScale = v);
+            SOSlider(kf, "Jar punch scale",    kf.jarPunchScale,    1f, 1.5f,   v => kf.jarPunchScale = v);
+            SOSlider(kf, "Jar punch time (s)", kf.jarPunchSeconds,  0.02f, 0.5f, v => kf.jarPunchSeconds = v);
+            EditorGUILayout.Space(3);
+            SOSlider(kf, "Arc height (px)",    kf.arcHeight,        0f, 400f,   v => kf.arcHeight = v);
+            SOSlider(kf, "Arc time (s)",       kf.arcSeconds,       0.05f, 1.5f, v => kf.arcSeconds = v);
+            SOSlider(kf, "Pot bounce (px)",    kf.potBouncePixels,  0f, 40f,    v => kf.potBouncePixels = v);
+            SOSlider(kf, "Pot bounce time (s)",kf.potBounceSeconds, 0.02f, 0.5f, v => kf.potBounceSeconds = v);
+            EditorGUILayout.Space(3);
+            SOSlider(kf, "Serve pop scale",    kf.servePopScale,    1f, 1.5f,   v => kf.servePopScale = v);
+            SOSlider(kf, "Serve pop time (s)", kf.servePopSeconds,  0.02f, 0.5f, v => kf.servePopSeconds = v);
+        }
+
+        Header("Catch of the Day — locked silhouette darkness (all jars)");
+        DrawSilhouetteTint();
+    }
+
+    // The catch jars' silhouette colour is a per-IngredientJar serialized field (lockedTint); edit them
+    // all at once so "blacked out" reads consistently. Applied at runtime by IngredientJar.SetLocked.
+    void DrawSilhouetteTint()
+    {
+        var jars = Jars();
+        if (jars.Length == 0) { EditorGUILayout.HelpBox("No jars in the open scene.", MessageType.None); return; }
+        var read = new SerializedObject(jars[0]).FindProperty("lockedTint");
+        if (read == null) { EditorGUILayout.HelpBox("IngredientJar has no lockedTint field.", MessageType.None); return; }
+
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            EditorGUI.BeginChangeCheck();
+            Color c = EditorGUILayout.ColorField("Locked silhouette tint", read.colorValue);
+            if (EditorGUI.EndChangeCheck())
+            {
+                foreach (var j in jars)
+                {
+                    var so = new SerializedObject(j);
+                    var p = so.FindProperty("lockedTint");
+                    if (p == null) continue;
+                    Undo.RecordObject(j, "Silhouette tint");
+                    p.colorValue = c;
+                    so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(j);
+                }
+                Dirty();
+            }
+            EditorGUILayout.LabelField($"→ applied to {jars.Length} jars. Re-open the kitchen (or re-enter Play) to re-tint locked jars.", EditorStyles.miniLabel);
+        }
     }
 
     // ---------- Tab: Night & Pace ----------
