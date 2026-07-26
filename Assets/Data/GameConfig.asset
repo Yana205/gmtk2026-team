@@ -14,14 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameConfigSO
   nightSeconds: 180
   lastCallSeconds: 30
-  patienceSeconds: 20
-  patienceBonusThreshold: 0.5
   delayBetweenCustomers: 0.5
   minSlotsToServe: 1
   coinsPerHeart: 5
-  patienceBonusCoins: 2
   lastCallMultiplier: 2
-  rankThresholds: 00000000080000000e00000014000000
+  rankThresholds: 0000000005000000090000000c000000
   rankLetters:
   - C
   - B

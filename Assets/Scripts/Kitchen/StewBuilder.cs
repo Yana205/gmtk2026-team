@@ -32,6 +32,10 @@ public class StewBuilder : MonoBehaviour
 
     [Header("Serve")]
     [SerializeField] private Button serveButton;
+    [Tooltip("Label inside the serve button — grayed together with the frame while the pot is empty")]
+    [SerializeField] private TMP_Text serveLabel;
+    [SerializeField] private Color serveBgDisabled    = new Color(0.42f, 0.38f, 0.35f, 1f);
+    [SerializeField] private Color serveLabelDisabled = new Color(0.72f, 0.69f, 0.65f, 0.55f);
 
     [Header("Pick feedback — shelf headers count 0/1 per slot, pot caption lists the contents")]
     [SerializeField] private TMP_Text mainHeader;
@@ -49,6 +53,8 @@ public class StewBuilder : MonoBehaviour
     private readonly Dictionary<SlotType, IngredientSO> picks = new Dictionary<SlotType, IngredientSO>();
     private Vector2 potHome;
     private bool serveWasOn;
+    private Image serveImage;
+    private Color serveBgColor, serveLabelColor;   // authored "ready" colors, captured in Awake
     private string headerBaseMain, headerBaseSide, headerBaseSauce;
     private Color headerRestColor;
 
@@ -56,6 +62,14 @@ public class StewBuilder : MonoBehaviour
     {
         potHome = potRect.anchoredPosition;
         serveButton.onClick.AddListener(() => gameManager.SubmitDish(picks));
+        // Serve button gray-out: we drive the colors ourselves, so neutralize the ColorTint's
+        // own disabled fade (it only touches the frame and would double-dim it).
+        serveImage = serveButton.GetComponent<Image>();
+        if (serveImage) serveBgColor = serveImage.color;
+        if (serveLabel) serveLabelColor = serveLabel.color;
+        var tint = serveButton.colors;
+        tint.disabledColor = Color.white;
+        serveButton.colors = tint;
         // Remember the authored header/caption text so the counters append to it instead of replacing it.
         if (mainHeader)  { headerBaseMain  = mainHeader.text;  headerRestColor = mainHeader.color; }
         if (sideHeader)    headerBaseSide  = sideHeader.text;
@@ -101,6 +115,7 @@ public class StewBuilder : MonoBehaviour
         RefreshPickFeedback();
         serveWasOn = false;
         serveButton.interactable = config.minSlotsToServe == 0;
+        ApplyServeVisuals(serveButton.interactable);
     }
 
     // One frame per slot: the picked jar wears the gold frame, its header flips to "1/1",
@@ -144,9 +159,17 @@ public class StewBuilder : MonoBehaviour
     private void RefreshServeGate()
     {
         serveButton.interactable = picks.Count >= config.minSlotsToServe;
+        ApplyServeVisuals(serveButton.interactable);
         if (serveButton.interactable && !serveWasOn)
             StartCoroutine(Tween.Punch(serveButton.transform, feel.servePopScale, feel.servePopSeconds));
         serveWasOn = serveButton.interactable;
+    }
+
+    // Empty pot = ashen, unclickable-looking; first pick brings the ember colors back.
+    private void ApplyServeVisuals(bool ready)
+    {
+        if (serveImage) serveImage.color = ready ? serveBgColor : serveBgDisabled;
+        if (serveLabel) serveLabel.color = ready ? serveLabelColor : serveLabelDisabled;
     }
 
     private void RedrawPot()

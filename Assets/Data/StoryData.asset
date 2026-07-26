@@ -25,7 +25,7 @@ MonoBehaviour:
   encoreBanner: "The first guest is back \u2014 craving today's catch!"
   unlockBeats:
   - ingredientToUnlock: {fileID: 11400000, guid: 97deed0de91e84432b982592c00c84e1, type: 2}
-    signArt: {fileID: 21300000, guid: df7aded929afd4ea99f3596e0e07bf70, type: 3}
+    signArt: {fileID: 21300000, guid: 389d56ffba5df4864a7a169907cb79f3, type: 3}
     toastLine: 'Letitia dropped off today''s kill: RAT KING!'
     hasNapkin: 0
     guestName: 
@@ -33,7 +33,7 @@ MonoBehaviour:
     portrait: {fileID: 0}
     idealStew: []
   - ingredientToUnlock: {fileID: 11400000, guid: 1dff0a89e28914ead940306d94c4a6fb, type: 2}
-    signArt: {fileID: 21300000, guid: 439001970f3e4433f982bea08b9ab633, type: 3}
+    signArt: {fileID: 21300000, guid: e79f3994e5bc24c8faabda7d6d244dba, type: 3}
     toastLine: 'Caledon dropped off today''s kill: NINE-TAILED FOX!'
     hasNapkin: 0
     guestName: 
@@ -41,7 +41,7 @@ MonoBehaviour:
     portrait: {fileID: 0}
     idealStew: []
   - ingredientToUnlock: {fileID: 11400000, guid: 496daac1643464433b5ffbc7b09da4d8, type: 2}
-    signArt: {fileID: 21300000, guid: 94e20d72ccb804f668ba6b1248e1818b, type: 3}
+    signArt: {fileID: 21300000, guid: 1c24f26f64c6e42e1b0c6d990480845a, type: 3}
     toastLine: 'Milog dropped off today''s kill: KRAKEN!'
     hasNapkin: 0
     guestName: 
