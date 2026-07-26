@@ -58,6 +58,8 @@ public class GameManager : MonoBehaviour
     private Dictionary<SlotType, IngredientSO> currentOrder;    // the secret craving
     private Dictionary<SlotType, IngredientSO> submittedPicks;  // what you cooked
     private bool nightOver;
+    private bool nightStarted;   // set once by the intro's Start button (or the debug skip)
+    private bool peeking;   // mid-cook look back at the guest — state stays Cooking, picks survive
 
     // ---------- lifecycle ----------
     private void Awake()
@@ -71,12 +73,26 @@ public class GameManager : MonoBehaviour
         screens.ShowTavern();
         dishOnCounter.SetActive(false);   // no bowl on the counter until the first dish is served
         SetState(GameState.Intro);   // intro panel active in scene by default
-        if (debug && debug.SkipIntroOn) StartNight();
+        if (debug && debug.SkipIntroOn) { nightStarted = true; StartCoroutine(StartNightRoutine(true)); }
     }
 
     // Wired to the intro card's Start button — also the WebGL audio unlock click
     public void StartNight()
     {
+        if (nightStarted) return;   // double-click guard while the intro fades
+        nightStarted = true;
+        StartCoroutine(StartNightRoutine(false));
+    }
+
+    private IEnumerator StartNightRoutine(bool instant)
+    {
+        var fade = introPanel.GetComponent<CanvasGroup>();
+        if (!instant && fade != null)
+        {
+            fade.interactable = false;
+            fade.blocksRaycasts = false;
+            yield return Tween.Fade(fade, 1f, 0f, 0.8f, tavernFeel.easeCurve);
+        }
         introPanel.SetActive(false);
         nightClock.Begin();
         NextCustomer();
@@ -85,10 +101,28 @@ public class GameManager : MonoBehaviour
     // ---------- reports from the world (the ONLY entry points) ----------
     public void OnMenuBookClicked()
     {
+        if (state == GameState.Cooking)
+        {
+            // Peeking at the guest — the book takes you back to the pot without resetting picks.
+            if (!peeking) return;
+            peeking = false;
+            screens.ShowKitchen();
+            if (menuBookButton) menuBookButton.interactable = false;
+            return;
+        }
         if (state != GameState.Ordering) return;
         SetState(GameState.Cooking);
         screens.ShowKitchen();
         stewBuilder.BeginCooking(currentOrder, generator.CurrentCharacter);   // portrait follows you in
+    }
+
+    // Kitchen "back to tavern" button: another look at the guest's outfit before committing the dish.
+    public void OnBackToTavernClicked()
+    {
+        if (state != GameState.Cooking || peeking) return;
+        peeking = true;
+        screens.ShowTavern();
+        if (menuBookButton) menuBookButton.interactable = true;   // the pulsing book leads back to the pot
     }
 
     public void SubmitDish(Dictionary<SlotType, IngredientSO> picks)
@@ -199,6 +233,7 @@ public class GameManager : MonoBehaviour
     private void SetState(GameState next)
     {
         state = next;
+        peeking = false;   // any real state change ends a tavern peek
         if (menuBookButton) menuBookButton.interactable = state == GameState.Ordering;
         if (customerButton) customerButton.interactable = state == GameState.Delivering;
         OnStateChanged?.Invoke(state);

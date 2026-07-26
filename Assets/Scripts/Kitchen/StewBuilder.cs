@@ -43,10 +43,13 @@ public class StewBuilder : MonoBehaviour
     [Header("Portrait — second BustDresser instance, small, top corner")]
     [SerializeField] private BustDresser portrait;
 
+    [Header("Steam — optional, simmers when empty and ramps with each pick")]
+    [SerializeField] private PotSteam steam;
+
     private readonly Dictionary<SlotType, IngredientSO> picks = new Dictionary<SlotType, IngredientSO>();
     private Vector2 potHome;
     private bool serveWasOn;
-    private string headerBaseMain, headerBaseSide, headerBaseSauce, potCaptionBase;
+    private string headerBaseMain, headerBaseSide, headerBaseSauce;
     private Color headerRestColor;
 
     private void Awake()
@@ -57,7 +60,6 @@ public class StewBuilder : MonoBehaviour
         if (mainHeader)  { headerBaseMain  = mainHeader.text;  headerRestColor = mainHeader.color; }
         if (sideHeader)    headerBaseSide  = sideHeader.text;
         if (sauceHeader)   headerBaseSauce = sauceHeader.text;
-        if (potCaption)    potCaptionBase  = potCaption.text;
         Clear();
     }
 
@@ -113,13 +115,21 @@ public class StewBuilder : MonoBehaviour
         RefreshHeader(mainHeader,  headerBaseMain,  SlotType.Main);
         RefreshHeader(sideHeader,  headerBaseSide,  SlotType.Side);
         RefreshHeader(sauceHeader, headerBaseSauce, SlotType.Sauce);
+        if (steam) steam.SetIntensity(Mathf.Lerp(0.25f, 1f, picks.Count / 3f));   // simmer -> boil
         if (potCaption)
         {
+            // Always spell out the 3-slot recipe shape: picked slots show their ingredient,
+            // empty slots show a dim "Main?" placeholder — that's how players learn "one of each".
             var sb = new StringBuilder();
             foreach (var slot in new[] { SlotType.Main, SlotType.Side, SlotType.Sauce })
+            {
+                if (sb.Length > 0) sb.Append("  ·  ");
                 if (picks.TryGetValue(slot, out var p) && p)
-                    sb.Append(sb.Length > 0 ? "  ·  " : "").Append(p.displayName);
-            potCaption.text = sb.Length > 0 ? sb.ToString() : potCaptionBase;
+                    sb.Append(p.displayName);
+                else
+                    sb.Append("<alpha=#55>").Append(slot).Append("?</alpha>");
+            }
+            potCaption.text = sb.ToString();
         }
     }
 

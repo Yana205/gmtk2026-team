@@ -26,6 +26,8 @@ public class IngredientJar : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private Color lockedTint = new Color(0.05f, 0.05f, 0.07f, 1f);
 
     private bool locked;
+    private bool hovered;
+    private bool selected;
 
     public IngredientSO Ingredient => ingredient;
 
@@ -42,9 +44,12 @@ public class IngredientJar : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     }
 
     // The "it's in the pot" marker — StewBuilder turns exactly one on per slot.
+    // A selected jar also keeps its name label pinned on, so you can read what you picked.
     public void SetSelected(bool value)
     {
+        selected = value;
         if (selectedFrame) selectedFrame.SetActive(value);
+        RefreshLabel();
     }
 
     // Locked = black silhouette of the jar art + not clickable. Unlocked = full colour + clickable.
@@ -66,19 +71,26 @@ public class IngredientJar : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             icon.color = ingredient.jarSprite ? Color.white : ingredient.placeholderColor;
     }
 
+    // Label shows while hovered OR while this jar is the current pick for its slot.
+    private void RefreshLabel()
+    {
+        if (!nameLabel) return;
+        bool show = hovered || (selected && !locked);
+        if (show) nameLabel.text = locked ? "???" : (ingredient ? ingredient.displayName : "");
+        nameLabel.enabled = show;
+    }
+
     public void OnPointerEnter(PointerEventData e)
     {
-        if (nameLabel)
-        {
-            nameLabel.text    = locked ? "???" : (ingredient ? ingredient.displayName : "");
-            nameLabel.enabled = true;
-        }
+        hovered = true;
+        RefreshLabel();
         if (!locked) transform.localScale = Vector3.one * HoverScale;   // no pop on a locked jar
     }
 
     public void OnPointerExit(PointerEventData e)
     {
-        if (nameLabel) nameLabel.enabled = false;
+        hovered = false;
+        RefreshLabel();
         transform.localScale = Vector3.one;
     }
 
