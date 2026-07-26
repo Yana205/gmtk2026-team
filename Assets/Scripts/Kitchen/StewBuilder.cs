@@ -126,8 +126,8 @@ public class StewBuilder : MonoBehaviour
                 if (sb.Length > 0) sb.Append("  ·  ");
                 if (picks.TryGetValue(slot, out var p) && p)
                     sb.Append(p.displayName);
-                else
-                    sb.Append("<alpha=#55>").Append(slot).Append("?</alpha>");
+                else                                       // TMP alpha tag has no closing form — reset by hand
+                    sb.Append("<alpha=#55>").Append(slot).Append("?<alpha=#FF>");
             }
             potCaption.text = sb.ToString();
         }
