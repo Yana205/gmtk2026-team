@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 // The open napkin. Opening freezes the world (one paused flag on GameManager); closing resumes it.
 // Lives on the always-active OverlayCanvas.
@@ -16,6 +17,7 @@ public class NotePanel : MonoBehaviour
     [SerializeField] private TMP_Text bodyLabel;        // writer's text VERBATIM
     [SerializeField] private GameObject prevArrow;      // Buttons wired to Prev()/Next() in inspector
     [SerializeField] private GameObject nextArrow;
+    [SerializeField] private Image portraitImage;       // who said it — hidden for napkins without one
 
     private List<StoryDataSO.UnlockBeat> napkins;
     private int index;
@@ -45,6 +47,11 @@ public class NotePanel : MonoBehaviour
         headerLabel.text = story.napkinHeader;
         guestLabel.text  = n.guestName;
         bodyLabel.text   = n.napkinText;
+        if (portraitImage)
+        {
+            portraitImage.enabled = n.portrait != null;
+            portraitImage.sprite  = n.portrait;
+        }
         prevArrow.SetActive(index > 0);
         nextArrow.SetActive(index < napkins.Count - 1);
     }

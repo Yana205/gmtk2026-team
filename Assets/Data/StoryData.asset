@@ -17,11 +17,12 @@ MonoBehaviour:
     quiet."
   introLine2: 
   endingLinesByRank:
-  - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank C)"
-  - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank B)"
-  - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank A)"
-  - "[WRITER TEXT \u2014 paste verbatim] (ending \u2014 rank S)"
+  - 
+  - 
+  - 
+  - 
   lastCallBanner: LAST CALL! Coins x2
+  encoreBanner: "The first guest is back \u2014 craving today's catch!"
   unlockBeats:
   - ingredientToUnlock: {fileID: 11400000, guid: 97deed0de91e84432b982592c00c84e1, type: 2}
     signArt: {fileID: 21300000, guid: df7aded929afd4ea99f3596e0e07bf70, type: 3}
@@ -29,6 +30,7 @@ MonoBehaviour:
     hasNapkin: 0
     guestName: 
     napkinText: 
+    portrait: {fileID: 0}
     idealStew: []
   - ingredientToUnlock: {fileID: 11400000, guid: 1dff0a89e28914ead940306d94c4a6fb, type: 2}
     signArt: {fileID: 21300000, guid: 439001970f3e4433f982bea08b9ab633, type: 3}
@@ -36,6 +38,7 @@ MonoBehaviour:
     hasNapkin: 0
     guestName: 
     napkinText: 
+    portrait: {fileID: 0}
     idealStew: []
   - ingredientToUnlock: {fileID: 11400000, guid: 496daac1643464433b5ffbc7b09da4d8, type: 2}
     signArt: {fileID: 21300000, guid: 94e20d72ccb804f668ba6b1248e1818b, type: 3}
@@ -43,6 +46,7 @@ MonoBehaviour:
     hasNapkin: 0
     guestName: 
     napkinText: 
+    portrait: {fileID: 0}
     idealStew: []
   napkinHeader: Tell us what you thought of the food!
   reactionNapkinsGood:

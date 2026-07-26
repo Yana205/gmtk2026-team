@@ -11,6 +11,8 @@ public class PotSteam : MonoBehaviour
 {
     [Range(0f, 1f)]      public float intensity      = 0.3f;
     [Header("Puff shape")]
+    [Tooltip("White = steam; warm tones turn it into candleglow/embers")]
+    public Color tint = Color.white;
     [Range(10f, 200f)]   public float startSize      = 46f;
     [Range(1f, 4f)]      public float endSizeFactor  = 2.1f;
     [Range(0f, 1f)]      public float maxAlpha       = 0.35f;
@@ -92,7 +94,7 @@ public class PotSteam : MonoBehaviour
         puff.phase = Random.Range(0f, Mathf.PI * 2f);
         puff.rect.anchoredPosition = new Vector2(puff.x0, 0f);
         puff.rect.sizeDelta = new Vector2(startSize, startSize);
-        puff.image.color = new Color(1f, 1f, 1f, 0f);
+        puff.image.color = new Color(tint.r, tint.g, tint.b, 0f);
         puff.rect.gameObject.SetActive(true);
     }
 

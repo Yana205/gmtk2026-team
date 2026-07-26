@@ -179,6 +179,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(config.delayBetweenCustomers);
         currentOrder = generator.Draw();
         yield return customerView.EnterRoutine(currentOrder, generator.CurrentCharacter);
+        // Encore guest's Main is today's catch, NOT what their outfit says — the banner is the tell.
+        if (generator.IsEncore && !string.IsNullOrEmpty(story.encoreBanner))
+            StartCoroutine(toast.ShowRoutine(story.encoreBanner));
         SetState(GameState.Ordering);   // no per-customer timer — the night clock is the only pressure
     }
 
@@ -190,13 +193,17 @@ public class GameManager : MonoBehaviour
         totalCoins  += result.coins;
         customersServed++;
         // Named visitor leaves THEIR verbatim napkin; grey-box customers fall back to the pooled lore.
+        // The encore guest already left theirs on the first visit — no duplicate.
         var ch = generator.CurrentCharacter;
-        if (ch != null && !string.IsNullOrEmpty(ch.napkinText))
-            napkins.Add(new StoryDataSO.UnlockBeat { hasNapkin = true, guestName = ch.displayName, napkinText = ch.napkinText });
-        else
+        if (!generator.IsEncore)
         {
-            var lore = story.MakeReactionNapkin(result.hearts, result.coins, customersServed);
-            if (lore != null) napkins.Add(lore);
+            if (ch != null && !string.IsNullOrEmpty(ch.napkinText))
+                napkins.Add(new StoryDataSO.UnlockBeat { hasNapkin = true, guestName = ch.displayName, napkinText = ch.napkinText, portrait = ch.portrait });
+            else
+            {
+                var lore = story.MakeReactionNapkin(result.hearts, result.coins, customersServed);
+                if (lore != null) napkins.Add(lore);
+            }
         }
         dishOnCounter.SetActive(false);
         customerView.ShowReaction(result.hearts);
@@ -225,9 +232,9 @@ public class GameManager : MonoBehaviour
     private void EndNight()
     {
         SetState(GameState.NightEnd);
+        // Rank is no longer shown — it only picks which authored ending line plays (if any).
         int rankIndex = ScoringService.RankIndex(totalHearts, config);
-        endScreen.Show(customersServed, totalHearts, totalCoins,
-                       rankIndex, story.endingLinesByRank[rankIndex]);
+        endScreen.Show(totalHearts, totalCoins, story.endingLinesByRank[rankIndex]);
     }
 
     private void SetState(GameState next)

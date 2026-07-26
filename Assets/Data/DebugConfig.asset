@@ -16,7 +16,7 @@ MonoBehaviour:
   logStateTransitions: 1
   showOverlay: 1
   screenSwitchHotkey: 0
-  freezeTimers: 1
+  freezeTimers: 0
   skipIntro: 0
   unlockAllJarsAtStart: 0
   nightSpeedMultiplier: 1

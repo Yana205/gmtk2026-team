@@ -13,12 +13,19 @@ public class CustomerGenerator : MonoBehaviour
     [SerializeField] private List<IngredientSO> allIngredients;
     [SerializeField] private DebugConfigSO debug;   // optional — AllJars cheat
 
+    [Header("Encore — after the last scripted visitor, the first returns craving the final catch")]
+    [Tooltip("Without this the last catch (Kraken) unlocks as the night ends and is never usable")]
+    [SerializeField] private bool encoreVisit = true;
+
     private readonly List<IngredientSO> unlocked = new List<IngredientSO>();
 
     private int visitorIndex = -1;
+    private IngredientSO lastUnlocked;   // the encore guest's craving
+    private bool encoreDrawn;
 
     public bool FixedMode => visitors != null && visitors.Count > 0;
-    public bool HasNext    => FixedMode && visitorIndex + 1 < visitors.Count;
+    public bool HasNext    => FixedMode && (visitorIndex + 1 < visitors.Count || (encoreVisit && !encoreDrawn));
+    public bool IsEncore  { get; private set; }
     public CharacterSO CurrentCharacter { get; private set; }
 
     private void Awake()
@@ -31,7 +38,9 @@ public class CustomerGenerator : MonoBehaviour
 
     public void Unlock(IngredientSO ing)
     {
-        if (ing != null && !unlocked.Contains(ing)) unlocked.Add(ing);
+        if (ing == null) return;
+        if (!unlocked.Contains(ing)) unlocked.Add(ing);
+        lastUnlocked = ing;
     }
 
     public Dictionary<SlotType, IngredientSO> Draw()
@@ -39,7 +48,19 @@ public class CustomerGenerator : MonoBehaviour
         if (FixedMode)
         {
             visitorIndex++;
-            CurrentCharacter = visitors[Mathf.Min(visitorIndex, visitors.Count - 1)];
+            if (visitorIndex >= visitors.Count)
+            {
+                // Encore: the first guest returns, and their craving swaps to today's final catch —
+                // that's the whole point of the visit (otherwise the Kraken unlocks into a dead night).
+                encoreDrawn = true;
+                IsEncore = true;
+                CurrentCharacter = visitors[0];
+                var encoreOrder = CurrentCharacter.ToOrder();
+                if (lastUnlocked != null) encoreOrder[lastUnlocked.slot] = lastUnlocked;
+                return encoreOrder;
+            }
+            IsEncore = false;
+            CurrentCharacter = visitors[visitorIndex];
             return CurrentCharacter.ToOrder();
         }
 

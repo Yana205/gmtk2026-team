@@ -13,6 +13,8 @@ public class StoryDataSO : ScriptableObject
 
     [Header("Banners")]
     public string lastCallBanner = "LAST CALL! Coins x2";
+    [Tooltip("Shown when the first guest returns after the scripted list — they crave today's catch")]
+    public string encoreBanner = "The first guest is back — craving today's catch!";
 
     [Header("Unlock beats — index-aligned with GameConfigSO.unlockTimes")]
     public UnlockBeat[] unlockBeats;
@@ -57,6 +59,8 @@ public class StoryDataSO : ScriptableObject
         public string guestName;
         [Tooltip("Writer's text VERBATIM — never edit here")]
         [TextArea(3, 8)] public string napkinText;
+        [Tooltip("Small portrait shown on the open napkin — set from CharacterSO for named visitors")]
+        public Sprite portrait;
 
         [Header("Dormant — only used if depth-ladder guest busts happen")]
         public IngredientSO[] idealStew;
