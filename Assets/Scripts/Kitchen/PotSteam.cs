@@ -23,17 +23,26 @@ public class PotSteam : MonoBehaviour
     [Range(0.4f, 4f)]    public float lifeSeconds    = 1.7f;
     [Tooltip("Seconds between puffs at full intensity")]
     [Range(0.05f, 1f)]   public float spawnInterval  = 0.28f;
+    [Header("Burst — the plop when something lands in the pot")]
+    [Range(0, 16)]       public int   burstPuffs        = 9;
+    [Tooltip("Burst puffs are this much bigger than the ambient simmer puffs")]
+    [Range(1f, 3f)]      public float burstSizeFactor   = 1.7f;
+    [Tooltip("Extra intensity right after a burst, decaying back to the base simmer")]
+    [Range(0f, 1.5f)]    public float burstBoost        = 1f;
+    [Range(0.2f, 3f)]    public float burstDecaySeconds = 1.3f;
 
     private class Puff
     {
         public RectTransform rect;
         public Image image;
         public float age, x0, phase;
+        public float sizeScale = 1f;   // burst puffs are bigger than simmer puffs
     }
 
     private readonly List<Puff> pool = new List<Puff>();
     private Sprite softCircle;
     private float spawnTimer;
+    private float boost;                 // burst leftover, decays in Update
 
     private void Awake()
     {
@@ -42,15 +51,26 @@ public class PotSteam : MonoBehaviour
 
     public void SetIntensity(float value) => intensity = Mathf.Clamp01(value);
 
+    // Something just hit the stew: an immediate clutch of BIG puffs (staggered so they read as a
+    // plume, not one blob) plus a boil-over that decays back to the base simmer.
+    public void Burst()
+    {
+        for (int i = 0; i < burstPuffs; i++)
+            Spawn(i * 0.05f, Random.Range(1f, burstSizeFactor));
+        boost = burstBoost;
+    }
+
     private void Update()
     {
         // Spawn: interval stretches as intensity drops; near-zero intensity stops emitting.
-        if (intensity > 0.02f)
+        float drive = Mathf.Clamp01(intensity + boost);
+        if (boost > 0f) boost = Mathf.Max(0f, boost - Time.deltaTime * burstBoost / burstDecaySeconds);
+        if (drive > 0.02f)
         {
             spawnTimer -= Time.deltaTime;
             if (spawnTimer <= 0f)
             {
-                spawnTimer = spawnInterval / intensity;
+                spawnTimer = spawnInterval / drive;
                 Spawn();
             }
         }
@@ -66,22 +86,22 @@ public class PotSteam : MonoBehaviour
             float rise = 1f - (1f - t) * (1f - t);
             float x = p.x0 + Mathf.Sin(p.age * 3f + p.phase) * wobble * t;
             p.rect.anchoredPosition = new Vector2(x, rise * riseHeight);
-            float size = startSize * Mathf.Lerp(1f, endSizeFactor, t);
+            float size = startSize * p.sizeScale * Mathf.Lerp(1f, endSizeFactor, t);
             p.rect.sizeDelta = new Vector2(size, size);
             var c = p.image.color;
-            c.a = maxAlpha * Mathf.Lerp(0.5f, 1f, intensity) * Mathf.Sin(t * Mathf.PI);
+            c.a = maxAlpha * Mathf.Lerp(0.5f, 1f, drive) * Mathf.Sin(t * Mathf.PI);
             p.image.color = c;
         }
     }
 
-    private void Spawn()
+    private void Spawn(float preAge = 0f, float sizeScale = 1f)
     {
         Puff puff = null;
         foreach (var p in pool)
             if (!p.rect.gameObject.activeSelf) { puff = p; break; }
         if (puff == null)
         {
-            if (pool.Count >= 12) return;              // plenty for the longest life/interval combo
+            if (pool.Count >= 20) return;              // covers a full burst on top of the boil
             var go = new GameObject("Puff", typeof(RectTransform), typeof(Image));
             go.transform.SetParent(transform, false);
             puff = new Puff { rect = (RectTransform)go.transform, image = go.GetComponent<Image>() };
@@ -89,7 +109,8 @@ public class PotSteam : MonoBehaviour
             puff.image.raycastTarget = false;
             pool.Add(puff);
         }
-        puff.age   = 0f;
+        puff.age   = preAge;
+        puff.sizeScale = sizeScale;
         puff.x0    = Random.Range(-spawnXJitter, spawnXJitter);
         puff.phase = Random.Range(0f, Mathf.PI * 2f);
         puff.rect.anchoredPosition = new Vector2(puff.x0, 0f);
@@ -99,7 +120,8 @@ public class PotSteam : MonoBehaviour
     }
 
     // Radial-falloff white circle, generated so we don't need a texture asset.
-    private static Sprite MakeSoftCircle(int size = 64)
+    // Public: CandleFlame builds its flame layers from the same sprite.
+    public static Sprite MakeSoftCircle(int size = 64)
     {
         var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
         float half = size * 0.5f;

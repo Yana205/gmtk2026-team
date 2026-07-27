@@ -37,6 +37,16 @@ public class TavernFeelSO : ScriptableObject
     public Color heartFullColor  = new Color(0.90f, 0.25f, 0.35f, 1f);
     public Color heartEmptyColor = new Color(0.35f, 0.35f, 0.40f, 0.5f);
 
+    [Header("Unhappy buzz — 0-1 heart reactions shake the bust (read by CustomerView)")]
+    [Range(0f, 40f)]   public float buzzPixels  = 12f;
+    [Tooltip("Full left-right cycles over the buzz")]
+    [Range(1f, 12f)]   public float buzzCycles  = 6f;
+    [Range(0.1f, 1.5f)] public float buzzSeconds = 0.5f;
+
+    [Header("Serve beat — the dish landing on the counter (read by GameManager)")]
+    [Range(1f, 1.5f)]  public float dishLandScale   = 1.1f;
+    [Range(0.05f, 1f)] public float dishLandSeconds = 0.35f;
+
     [Header("Banners & toasts — read by ToastBanner")]
     [Range(0.05f, 1f)] public float bannerSlideSeconds = 0.25f;
     [Range(0.5f, 5f)]  public float toastHoldSeconds = 2.5f;

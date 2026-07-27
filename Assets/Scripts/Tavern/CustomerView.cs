@@ -54,9 +54,16 @@ public class CustomerView : MonoBehaviour
         rect.anchoredPosition = homePos;
         if (hearts >= feel.happyFaceMinHearts)
             StartCoroutine(Tween.Hop(rect, homePos, feel.happyHopHeight, feel.happyHopSeconds, feel.easeCurve));
-        else if (hearts == 0)
-            // slump down — now eased instead of teleporting
-            StartCoroutine(Tween.Move(rect, homePos, homePos + Vector2.down * feel.sadDroopPixels, feel.sadDroopSeconds, feel.easeCurve));
+        else if (hearts <= 1)
+            StartCoroutine(UnhappyRoutine(hearts == 0));
+    }
+
+    // 1 heart = an annoyed buzz; 0 hearts = the buzz, then the slump. Fits inside the reaction beat.
+    private IEnumerator UnhappyRoutine(bool slump)
+    {
+        yield return Tween.Shake(rect, homePos, feel.buzzPixels, feel.buzzCycles, feel.buzzSeconds);
+        if (slump)
+            yield return Tween.Move(rect, homePos, homePos + Vector2.down * feel.sadDroopPixels, feel.sadDroopSeconds, feel.easeCurve);
     }
 
     public IEnumerator ExitRoutine(bool happy)

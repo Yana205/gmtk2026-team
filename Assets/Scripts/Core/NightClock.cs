@@ -25,6 +25,15 @@ public class NightClock : MonoBehaviour
 
     public float SecondsLeft { get; private set; }
     public bool  Running     { get; private set; }
+    public bool  TimerOff    { get; private set; }   // cozy mode — set by SettingsBar
+
+    // Cozy mode: the countdown stops and hides, the candle just burns steady. The night still
+    // has structure — GameManager ends it when the scripted guest list runs out.
+    public void SetTimerOff(bool off)
+    {
+        TimerOff = off;
+        if (off || Running) RefreshDisplay();
+    }
 
     private bool lastCallFired;
     private int  nextUnlockIndex;
@@ -40,6 +49,7 @@ public class NightClock : MonoBehaviour
     private void Update()
     {
         if (!Running) return;
+        if (TimerOff) return;             // cozy mode — no countdown at all
         if (gameManager.Paused) return;   // napkin open — the world holds its breath
         if (debug && debug.FreezeOn) return;   // design mode — the night stands still
 
@@ -74,6 +84,13 @@ public class NightClock : MonoBehaviour
 
     private void RefreshDisplay()
     {
+        if (TimerOff)
+        {
+            // No numbers, no drain — the candle is just cozy decor now.
+            if (timeLabel) timeLabel.text = "";
+            if (candleFill) candleFill.fillAmount = 1f;
+            return;
+        }
         if (timeLabel)
         {
             int m = Mathf.FloorToInt(SecondsLeft / 60f);

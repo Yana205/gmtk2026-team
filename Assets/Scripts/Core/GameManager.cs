@@ -142,6 +142,8 @@ public class GameManager : MonoBehaviour
         }
         if (dishImage) dishImage.enabled = haveDish;   // never leave a blank/stale bowl on the counter
         dishOnCounter.SetActive(true);            // dish + mead mug together
+        // The serve beat: the dish lands on the counter with a thump.
+        StartCoroutine(Tween.Punch(dishOnCounter.transform, tavernFeel.dishLandScale, tavernFeel.dishLandSeconds));
     }
 
     public void OnCustomerClicked()
@@ -198,7 +200,13 @@ public class GameManager : MonoBehaviour
         if (!generator.IsEncore)
         {
             if (ch != null && !string.IsNullOrEmpty(ch.napkinText))
-                napkins.Add(new StoryDataSO.UnlockBeat { hasNapkin = true, guestName = ch.displayName, napkinText = ch.napkinText, portrait = ch.portrait });
+                napkins.Add(new StoryDataSO.UnlockBeat
+                {
+                    hasNapkin = true, guestName = ch.displayName, portrait = ch.portrait,
+                    // The napkin is the performance prize: full lore for a perfect serve,
+                    // redacted lore + a scaled hint at what was missed otherwise.
+                    napkinText = NapkinReward.Compose(ch.napkinText, result.hearts, currentOrder, submittedPicks),
+                });
             else
             {
                 var lore = story.MakeReactionNapkin(result.hearts, result.coins, customersServed);

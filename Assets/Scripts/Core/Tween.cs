@@ -52,6 +52,19 @@ public static class Tween
         r.anchoredPosition = home;
     }
 
+    // Unhappy buzz: fast horizontal shake that decays to rest, in anchored space
+    public static IEnumerator Shake(RectTransform r, Vector2 home, float pixels, float cycles, float seconds)
+    {
+        for (float t = 0f; t < seconds; t += Time.deltaTime)
+        {
+            float p = t / seconds;
+            float x = Mathf.Sin(p * cycles * Mathf.PI * 2f) * pixels * (1f - p);
+            r.anchoredPosition = home + Vector2.right * x;
+            yield return null;
+        }
+        r.anchoredPosition = home;
+    }
+
     // Scale punch: fast attack to the peak, then a damped overshoot settle back (snappier than a linear triangle).
     public static IEnumerator Punch(Transform tr, float scale, float seconds)
     {

@@ -200,6 +200,7 @@ public class StewBuilder : MonoBehaviour
         float height = feel.arcHeight * (rootCanvas ? rootCanvas.scaleFactor : 1f);
         yield return Tween.ArcWorld(flyer.rectTransform, from, to, height, feel.arcSeconds, feel.easeCurve);
         flyer.gameObject.SetActive(false);
+        if (steam) steam.Burst();   // the splash — food hits the stew, the boil answers
         yield return Tween.Hop(potRect, potHome, feel.potBouncePixels, feel.potBounceSeconds, feel.easeCurve);
     }
 }
